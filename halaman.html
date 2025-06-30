@@ -235,7 +235,7 @@
         }
         /* Akhir Navigasi Desktop */
 
-        /* Overlay Menu Kategori (Disalin dari index.html) */
+        /* Overlay Menu Kategori */
         .more-menu-overlay {
             position: fixed;
             top: 0;
@@ -277,7 +277,7 @@
             font-family: var(--heading-font);
         }
         
-        /* Gaya Grid Kategori dalam Overlay (Disalin dari index.html) */
+        /* Gaya Grid Kategori dalam Overlay */
         #category-grid { 
             display: grid;
             grid-template-columns: 1fr 1fr; /* 2 kolom untuk mobile */
@@ -314,7 +314,7 @@
             color: var(--text-color);
         }
 
-        /* Overlay Pencarian (Disalin dari index.html) */
+        /* Overlay Pencarian */
         .search-overlay {
             position: fixed;
             top: 0;
@@ -384,7 +384,7 @@
             margin-top: 20px;
         }
 
-        /* Media Queries (Disalin dari index.html) */
+        /* Media Queries */
         @media (min-width: 600px) {
             #category-grid {
                 grid-template-columns: 1fr 1fr 1fr; /* 3 kolom untuk tablet */
@@ -435,10 +435,10 @@
             <img src="logo.png" alt="Logo Petungan" class="logo">
         </a>
         <a href="index.html">
-            <h1 class="site-title">Petungan</h1>
+            <h1 id="site-title" class="site-title">Petungan</h1>
         </a>
     </header>
-    
+
     <div class="desktop-nav-wrapper">
         <nav class="desktop-nav" id="desktop-main-nav">
             <a href="index.html" id="desktop-home-btn"><i class="fas fa-home"></i><span>Home</span></a>  
@@ -449,12 +449,17 @@
         <a href="#" id="desktop-search-news-btn-icon" class="desktop-search-icon"><i class="fas fa-search"></i></a>
     </div>
     <main class="container">
-        <h1 id="page-title" style="font-family: var(--heading-font); font-size: 2rem; margin-bottom: 20px; text-align: center;">Memuat Halaman...</h1>
-        <div id="page-content" class="page-content">
-            <p>Mohon tunggu...</p>
+        <div class="article-container" id="article-detail-container">
+            <p>Memuat detail berita...</p>
+        </div>
+
+        <div class="related-news-section" id="related-news-section" style="display: none;">
+            <h2>Berita Terkait</h2>
+            <div class="related-news-grid" id="related-news-grid">
+                </div>
         </div>
     </main>
-    
+
     <div class="more-menu-overlay" id="more-menu-overlay">
         <div class="grid-menu-container">
             <h2>Kategori Berita</h2>
@@ -493,12 +498,134 @@
 
     <script>
         // --- FUNGSI UTILITY ---
-        function getFirstImageFromContent(htmlContent) { /* Tidak dipakai langsung di sini */ return null; }
+        function getFirstImageFromContent(htmlContent) {
+            if (!htmlContent) return null;
+            const match = htmlContent.match(/<img[^>]+src="([^">]+)"/);
+            return match ? match[1] : null;
+        }
+
         function formatCategoryName(slug) {
             if (!slug || slug === 'undefined') return 'Umum';
             return slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
         }
 
+        // --- FUNGSI PEMBUAT ELEMEN BERITA (untuk berita terkait) ---
+        function createGridItem(news) {
+            const newsUrl = `detail.html?id=${news.id}`;
+            const imageUrl = getFirstImageFromContent(news.content) || `https://picsum.photos/400/225?random=${news.id}`; 
+            const element = document.createElement('a');
+            element.href = newsUrl;
+            element.className = 'news-item-card news-grid';
+
+            element.innerHTML = `
+                <img src="${imageUrl}" alt="${news.title || 'Gambar Berita'}" class="news-image">
+                <div class="news-content">
+                    <h4 class="news-title">${news.title || 'Judul Berita'}</h4>
+                    <p class="news-meta">Oleh: ${news.editor_name || 'Petungan'} - ${news.createdAt ? news.createdAt.toDate().toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}</p>
+                </div>
+            `;
+            return element;
+        }
+
+
+        // --- FUNGSI LOAD DETAIL BERITA ---
+        async function loadNewsDetail() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const newsId = urlParams.get('id');
+            const articleContainer = document.getElementById('article-detail-container');
+            const detailPageTitle = document.getElementById('detail-page-title');
+
+            if (!newsId) {
+                articleContainer.innerHTML = '<p style="color:red;">ID berita tidak ditemukan.</p>';
+                detailPageTitle.textContent = 'Berita Tidak Ditemukan';
+                return;
+            }
+
+            try {
+                const docRef = db.collection('berita').doc(newsId);
+                const doc = await docRef.get();
+
+                if (doc.exists) {
+                    const news = doc.data();
+                    detailPageTitle.textContent = news.title || 'Detail Berita';
+
+                    const mainImageUrl = getFirstImageFromContent(news.content) || `https://picsum.photos/1200/600?random=${news.id}`;
+
+                    articleContainer.innerHTML = `
+                        <h1 class="article-title">${news.title || 'Judul Berita'}</h1>
+                        <p class="article-meta">Oleh: ${news.editor_name || 'Petungan'} - ${news.createdAt ? news.createdAt.toDate().toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}</p>
+                        <img src="${mainImageUrl}" alt="${news.title || 'Gambar Berita'}" class="article-image">
+                        <div class="article-content">${news.content || '<p>Konten berita tidak tersedia.</p>'}</div>
+                    `;
+
+                    // Load related news based on category
+                    if (news.category) {
+                        loadRelatedNews(news.category, newsId);
+                    }
+
+                } else {
+                    articleContainer.innerHTML = '<p style="color:red;">Berita tidak ditemukan.</p>';
+                    detailPageTitle.textContent = 'Berita Tidak Ditemukan';
+                }
+            } catch (error) {
+                console.error("Error fetching news detail:", error);
+                articleContainer.innerHTML = '<p style="color:red;">Gagal memuat detail berita. Pastikan koneksi internet Anda stabil atau coba lagi nanti.</p>';
+                detailPageTitle.textContent = 'Error';
+            }
+        }
+
+        // --- FUNGSI LOAD BERITA TERKAIT ---
+        async function loadRelatedNews(category, currentNewsId) {
+            const relatedNewsSection = document.getElementById('related-news-section');
+            const relatedNewsGrid = document.getElementById('related-news-grid');
+            relatedNewsGrid.innerHTML = '<p style="text-align: center;">Memuat berita terkait...</p>';
+            relatedNewsSection.style.display = 'block';
+
+            try {
+                const snapshot = await db.collection('berita')
+                    .where('category', '==', category)
+                    .orderBy('createdAt', 'desc')
+                    .limit(4) // Ambil beberapa berita terkait
+                    .get();
+
+                relatedNewsGrid.innerHTML = ''; // Bersihkan placeholder
+
+                let count = 0;
+                snapshot.forEach(doc => {
+                    if (doc.id !== currentNewsId && count < 3) { // Jangan tampilkan berita yang sedang dilihat, dan batasi 3
+                        const news = doc.data();
+                        relatedNewsGrid.appendChild(createGridItem({ id: doc.id, ...news }));
+                        count++;
+                    }
+                });
+
+                if (count === 0) {
+                    relatedNewsGrid.innerHTML = '<p style="text-align: center;">Tidak ada berita terkait lainnya.</p>';
+                }
+
+            } catch (error) {
+                console.error("Error fetching related news:", error);
+                relatedNewsGrid.innerHTML = '<p style="color:red; text-align: center;">Gagal memuat berita terkait.</p>';
+            }
+        }
+
+        // --- FUNGSI PENCARIAN ---
+        async function searchNews(keyword) {
+            if (!keyword || keyword.trim() === '') {
+                document.getElementById('search-results').innerHTML = '<p style="color: red; text-align: center;">Silakan masukkan kata kunci pencarian.</p>';
+                return;
+            }
+            
+            document.getElementById('search-overlay').classList.remove('visible');
+            
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.value = '';
+            }
+            
+            window.location.href = `index.html?cari=${encodeURIComponent(keyword)}`;
+        }
+        
         // --- FUNGSI LOAD KATEGORI UNTUK POPUP ---
         async function loadCategoriesForPopup() {
             const container = document.getElementById('category-grid'); 
@@ -523,6 +650,7 @@
 
                 mainCategoriesSnapshot.forEach(doc => {
                     const mainCategory = doc.data();
+                    // Tambahkan kategori utama jika Anda ingin tampilkan sebagai kartu di grid
                     if (mainCategory.slug && mainCategory.nama) {
                         allCategoriesToDisplay.push({
                             nama: mainCategory.nama,
@@ -531,6 +659,7 @@
                         });
                     }
 
+                    // Tambahkan subkategori dari array jika ada
                     if (mainCategory.subkategori && Array.isArray(mainCategory.subkategori)) {
                         mainCategory.subkategori.forEach(sub => {
                             if (sub.slug && sub.nama_sub) { 
@@ -560,23 +689,6 @@
                 console.error("Gagal memuat kategori:", error); 
                 container.innerHTML = '<p style="color:red; text-align: center;">Gagal memuat kategori.</p>';
             }
-        }
-
-        // FUNGSI PENCARIAN (disalin dari index.html)
-        async function searchNews(keyword) {
-            if (!keyword || keyword.trim() === '') {
-                document.getElementById('search-results').innerHTML = '<p style="color: red; text-align: center;">Silakan masukkan kata kunci pencarian.</p>';
-                return;
-            }
-            
-            document.getElementById('search-overlay').classList.remove('visible');
-            
-            const searchInput = document.getElementById('search-input');
-            if (searchInput) {
-                searchInput.value = '';
-            }
-            
-            window.location.href = `index.html?cari=${encodeURIComponent(keyword)}`;
         }
 
         // FUNGSI BARU: Memuat kategori ke navigasi desktop
@@ -665,53 +777,13 @@
             }
         }
 
-        // Fungsi khusus untuk memuat halaman statis (dari halaman.html)
-        async function loadPageContent() {
-            const params = new URLSearchParams(window.location.search);
-            const pageId = params.get('id'); // Mengambil 'id' untuk halaman.html
-            const pageTitleElement = document.getElementById('page-title');
-            const pageContentElement = document.getElementById('page-content');
-            const pageHeadTitleElement = document.getElementById('page-head-title');
-
-
-            if (!pageId) {
-                pageTitleElement.textContent = 'Halaman Tidak Ditemukan';
-                pageContentElement.innerHTML = '<p>Error: ID halaman tidak valid.</p>';
-                pageHeadTitleElement.textContent = 'Halaman Tidak Ditemukan'; // Update head title
-                return;
-            }
-
-            try {
-                // Query koleksi 'halaman' berdasarkan 'id'
-                const docRef = db.collection('halaman').doc(pageId); 
-                const docSnap = await docRef.get();
-
-                if (docSnap.exists) {
-                    const data = docSnap.data();
-                    document.title = data.judul || 'Halaman Petungan'; // Set judul tab browser
-                    pageTitleElement.textContent = data.judul || 'Halaman Tanpa Judul';
-                    pageContentElement.innerHTML = data.konten || '<p>Konten tidak tersedia.</p>'; // Menggunakan konten
-                    pageHeadTitleElement.textContent = data.judul || 'Halaman Petungan'; // Update head title
-                } else {
-                    pageTitleElement.textContent = 'Halaman Belum Dibuat';
-                    pageContentElement.innerHTML = '<p>Konten untuk halaman ini belum tersedia.</p>';
-                    pageHeadTitleElement.textContent = 'Halaman Belum Dibuat'; // Update head title
-                }
-            } catch (error) {
-                console.error("Error memuat halaman:", error);
-                pageTitleElement.textContent = 'Gagal Memuat';
-                pageContentElement.innerHTML = '<p>Terjadi kesalahan saat memuat konten.</p>';
-                pageHeadTitleElement.textContent = 'Gagal Memuat'; // Update head title
-            }
-        }
-
 
         // --- EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', () => {
-            loadPageContent(); // Panggil fungsi untuk memuat konten halaman
-            loadCategoriesForDesktopNav(); // Panggil fungsi ini di halaman statis juga
-            
-            // Event listener untuk tombol navigasi mobile (disalin dari index.html)
+            loadNewsDetail(); 
+            loadCategoriesForDesktopNav(); // Panggil fungsi baru ini
+
+            // Event listener untuk Navigasi Mobile (sudah ada)
             document.getElementById('mobile-home-btn').addEventListener('click', (e) => { 
                 e.preventDefault(); 
                 window.location.href = 'index.html';
@@ -793,12 +865,7 @@
                 document.querySelectorAll('.mobile-nav a, .desktop-nav a').forEach(link => link.classList.remove('active'));
                 const currentCategorySlug = urlParams.get('kategori');
 
-                if (urlParams.has('id') || urlParams.has('slug')) { // Untuk halaman.html atau lihat.html
-                    // Untuk halaman statis, selalu aktifkan Home di navigasi
-                    if (document.getElementById(prefix + 'home-btn')) { 
-                         document.getElementById(prefix + 'home-btn').classList.add('active');
-                    }
-                } else if (!urlParams.has('kategori') && !urlParams.has('cari') && !urlParams.has('terbaru')) {
+                if (!urlParams.has('kategori') && !urlParams.has('cari') && !urlParams.has('terbaru')) {
                     if (document.getElementById(prefix + 'home-btn')) {
                          document.getElementById(prefix + 'home-btn').classList.add('active');
                     }
