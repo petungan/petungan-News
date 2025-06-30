@@ -236,7 +236,7 @@
             right: 0;
             height: 65px;
             background-color: var(--header-bg); 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
             z-index: 1001; 
             display: flex; 
             justify-content: space-around;
@@ -320,14 +320,14 @@
         .desktop-search-icon-wrapper {
             display: none; /* Sembunyikan secara default */
             position: absolute; /* Posisi absolut */
-            right: 30px; /* Dari kanan halaman */
-            top: 80px; /* Di bawah header */
+            right: 15px; /* Dari kanan container */
+            top: 85px; /* Di bawah header, sejajar dengan nav */
             z-index: 1000;
         }
 
         .desktop-search-icon {
             color: #555;
-            font-size: 1.5rem; /* Ukuran ikon */
+            font-size: 1.5rem;
             cursor: pointer;
             padding: 5px; /* Area klik */
         }
@@ -613,7 +613,6 @@
                 display: block; /* Tampilkan navigasi desktop */
                 position: sticky; /* Sticky di desktop */
                 top: 70px; /* Di bawah header (50px) + sedikit jarak */
-                /* Z-index 999, border-radius 8px, box-shadow sudah ada */
             }
             .site-header {
                 height: 70px; /* Beri sedikit lebih banyak ruang untuk header di desktop */
@@ -651,18 +650,18 @@
             <img src="logo.png" alt="Logo Petungan" class="logo">
         </a>
         <a href="index.html">
-            <h1 class="site-title">Petungan</h1>
+            <h1 id="site-title" class="site-title">Petungan</h1>
         </a>
     </header>
 
     <div class="desktop-nav-wrapper">
         <nav class="desktop-nav" id="desktop-main-nav">
             <a href="index.html" id="desktop-home-btn"><i class="fas fa-home"></i><span>Home</span></a>  
-            <a href="index.html?terbaru=true" id="desktop-latest-news-btn"><i class="fas fa-fire"></i><span>Berita Terbaru</span></a>
+            <a href="#" id="desktop-latest-news-btn"><i class="fas fa-fire"></i><span>Berita Terbaru</span></a>
         </nav>
     </div>
     <div class="desktop-search-icon-wrapper">
-        <a href="#" id="desktop-search-news-btn-icon" class="desktop-search-icon"><i class="fas fa-search"></i></a>
+        <a href="#" id="desktop-search-news-btn" class="desktop-search-icon"><i class="fas fa-search"></i></a>
     </div>
     <main class="container">
         <div class="news-feed" id="news-feed-container">
@@ -1027,9 +1026,9 @@
         async function loadCategoriesForDesktopNav() {
             const desktopMainNav = document.getElementById('desktop-main-nav');
             // Hapus tombol Kategori yang lama jika ada
-            const desktopCategoryBtn = document.getElementById('desktop-more-menu-btn'); // Ini ID untuk tombol Kategori mobile
+            const desktopCategoryBtn = document.getElementById('desktop-more-menu-btn');
             if (desktopCategoryBtn) {
-                // desktopCategoryBtn.remove(); // Jangan hapus jika itu tombol mobile
+                desktopCategoryBtn.remove();
             }
 
             try {
@@ -1046,33 +1045,32 @@
                     }
                 });
 
+                // Tampilkan maksimal sekitar 5-7 kategori utama langsung di nav, sisanya bisa di "Semua Kategori"
                 const maxCategoriesToShow = 6; 
                 let categoriesRendered = 0;
 
-                // Tambahkan link "Semua Kategori" di awal jika ada kategori yang tersembunyi
+                for (const categoryData of categoriesToAdd) {
+                    if (categoriesRendered >= maxCategoriesToShow) break; // Batasi jumlah yang ditampilkan
+                    const link = document.createElement('a');
+                    link.href = `index.html?kategori=${categoryData.slug}`;
+                    link.id = `desktop-category-${categoryData.slug}-btn`; // Tambahkan ID untuk active state
+                    link.textContent = categoryData.nama; // Hanya teks kategori
+                    desktopMainNav.insertBefore(link, document.getElementById('desktop-latest-news-btn')); // Masukkan sebelum Berita Terbaru
+                    categoriesRendered++;
+                }
+
+                // Tambahkan tombol "Semua Kategori" jika ada kategori yang tersembunyi
                 if (categoriesToAdd.length > maxCategoriesToShow) {
                     const allCategoriesLink = document.createElement('a');
-                    allCategoriesLink.href = '#'; 
+                    allCategoriesLink.href = '#'; // Tidak langsung ke halaman, tapi buka overlay
                     allCategoriesLink.id = 'desktop-all-categories-btn';
                     allCategoriesLink.textContent = 'Semua Kategori';
                     allCategoriesLink.addEventListener('click', (e) => {
                         e.preventDefault();
-                        loadCategoriesForPopup(); 
+                        loadCategoriesForPopup(); // Buka overlay kategori
                         document.getElementById('more-menu-overlay').classList.add('visible');
                     });
-                    desktopMainNav.appendChild(allCategoriesLink); // Tambahkan di akhir setelah kategori spesifik
-                }
-
-
-                // Tambahkan kategori spesifik
-                for (const categoryData of categoriesToAdd) {
-                    if (categoriesRendered >= maxCategoriesToShow) break; 
-                    const link = document.createElement('a');
-                    link.href = `index.html?kategori=${categoryData.slug}`;
-                    link.id = `desktop-category-${categoryData.slug}-btn`; 
-                    link.textContent = categoryData.nama; 
-                    desktopMainNav.appendChild(link); // Tambahkan di akhir nav
-                    categoriesRendered++;
+                    desktopMainNav.insertBefore(allCategoriesLink, document.getElementById('desktop-latest-news-btn'));
                 }
 
             } catch (error) {
@@ -1087,7 +1085,7 @@
                     loadCategoriesForPopup();
                     document.getElementById('more-menu-overlay').classList.add('visible');
                 });
-                desktopMainNav.appendChild(fallbackCategoryLink);
+                desktopMainNav.insertBefore(fallbackCategoryLink, document.getElementById('desktop-latest-news-btn'));
             }
         }
 
@@ -1162,8 +1160,8 @@
             });
 
             // Event listener untuk tombol pencarian desktop (ikon di kanan atas)
-            const desktopSearchIconBtn = document.getElementById('desktop-search-news-btn-icon'); 
-            if (desktopSearchIconBtn) { 
+            const desktopSearchIconBtn = document.getElementById('desktop-search-news-btn-icon'); // ID baru untuk ikon
+            if (desktopSearchIconBtn) { // Pastikan elemennya ada
                 desktopSearchIconBtn.addEventListener('click', (e) => {
                     e.preventDefault();
                     document.getElementById('search-overlay').classList.add('visible');
@@ -1199,8 +1197,6 @@
                 } else if (urlParams.has('cari')) {
                     if (document.getElementById(prefix + 'search-news-btn')) {
                         document.getElementById(prefix + 'search-news-btn').classList.add('active');
-                    } else if (document.getElementById(`${prefix}search-news-btn-icon`)) { // Untuk ikon pencarian desktop
-                        document.getElementById(`${prefix}search-news-btn-icon`).classList.add('active');
                     }
                 } else if (urlParams.has('terbaru')) {
                     if (document.getElementById(prefix + 'latest-news-btn')) {
