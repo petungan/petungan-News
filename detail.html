@@ -596,6 +596,9 @@
             margin-bottom: 20px;
             border-bottom: 1px solid var(--light-grey);
             padding-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .article-image {
@@ -657,6 +660,45 @@
             display: grid;
             grid-template-columns: 1fr;
             gap: 20px;
+        }
+
+        /* Tombol Share Sosial Media */
+        .social-share {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .social-share a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            transition: transform 0.2s ease;
+        }
+
+        .social-share a:hover {
+            transform: translateY(-2px);
+        }
+
+        .facebook-share {
+            background-color: #3b5998;
+        }
+
+        .twitter-share {
+            background-color: #1da1f2;
+        }
+
+        .whatsapp-share {
+            background-color: #25d366;
+        }
+
+        .telegram-share {
+            background-color: #0088cc;
         }
 
         /* Media Queries untuk Responsif */
@@ -856,6 +898,28 @@
             return element;
         }
 
+        // --- FUNGSI UNTUK MEMBUAT TOMBOL SHARE ---
+        function createSocialShareButtons(title, url) {
+            const encodedTitle = encodeURIComponent(title);
+            const encodedUrl = encodeURIComponent(url);
+            
+            return `
+                <div class="social-share">
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}" target="_blank" class="facebook-share" title="Share ke Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}" target="_blank" class="twitter-share" title="Share ke Twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="https://wa.me/?text=${encodedTitle}%20${encodedUrl}" target="_blank" class="whatsapp-share" title="Share ke WhatsApp">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                    <a href="https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}" target="_blank" class="telegram-share" title="Share ke Telegram">
+                        <i class="fab fa-telegram-plane"></i>
+                    </a>
+                </div>
+            `;
+        }
 
         // --- FUNGSI LOAD DETAIL BERITA ---
         async function loadNewsDetail() {
@@ -879,10 +943,15 @@
                     detailPageTitle.textContent = news.title || 'Detail Berita';
 
                     const mainImageUrl = getFirstImageFromContent(news.content) || `https://picsum.photos/1200/600?random=${news.id}`;
+                    const currentUrl = window.location.href;
+                    const socialShareButtons = createSocialShareButtons(news.title || 'Judul Berita', currentUrl);
 
                     articleContainer.innerHTML = `
                         <h1 class="article-title">${news.title || 'Judul Berita'}</h1>
-                        <p class="article-meta">Oleh: ${news.editor_name || 'Petungan'} - ${news.createdAt ? news.createdAt.toDate().toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}</p>
+                        <p class="article-meta">
+                            Oleh: ${news.editor_name || 'Petungan'} - ${news.createdAt ? news.createdAt.toDate().toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}
+                            ${socialShareButtons}
+                        </p>
                         <img src="${mainImageUrl}" alt="${news.title || 'Gambar Berita'}" class="article-image">
                         <div class="article-content">${news.content || '<p>Konten berita tidak tersedia.</p>'}</div>
                     `;
