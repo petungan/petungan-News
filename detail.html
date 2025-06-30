@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Memuat Berita...</title>
+    <meta name="description" content="Sebuah artikel dari situs Petungan.">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="Petungan">
+    <meta property="og:title" content="Petungan" />
+    <meta property="og:description" content="Sebuah artikel dari situs Petungan." />
+    <meta property="og:image" content="https://petungan.github.io/petungan-News/logo.png" />
+    <meta property="og:url" content="https://petungan.github.io/petungan-News/" />
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Petungan">
+    <meta name="twitter:description" content="Sebuah artikel dari situs Petungan.">
+    <meta name="twitter:image" content="https://petungan.github.io/petungan-News/logo.png">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script> 
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script>
+        // Konfigurasi Firebase Anda (pastikan ini sama di semua file)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCNnM11tIUEl4eu5AYTObXdlDI47EZts-A",
+            authDomain: "petugan-jawa-news.firebaseapp.com",
+            projectId: "petugan-jawa-news",
+            storageBucket: "petugan-jawa-news.firebasestorage.app",
+            messagingSenderId: "928855786984",
+            appId: "1:928855786984:web:9d7f0b7a7022943895d05d",
+            measurementId: "G-DV19ZVP0KE"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <meta name="theme-color" content="#2c3e50"/>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="logo.png">
+
+    <style>
+        :root {
+            --primary-font: 'Roboto', sans-serif;
+            --heading-font: 'Merriweather', serif;
+            --text-color: #333;
+            --background-color: #f4f4f4;
+            --header-bg: #fff;
+            --card-bg: #fff;
+            --accent-color: #8B4513; /* Warna Coklat */
+            --light-grey: #eee;
+            --dark-grey: #777;
+        }
+
+        html {
+            height: 100%; 
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box; 
+        }
+
+        body {
+            height: auto; 
+            min-height: 100%; 
+            font-family: var(--primary-font);
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            padding-top: 70px; /* Ruang untuk header yang fixed */
+            padding-bottom: 120px; /* Ruang untuk navigasi mobile yang fixed + footer */
+            box-sizing: border-box; 
+        }
+
+        .container {
+            max-width: 800px; /* Lebih kecil untuk detail artikel */
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Header Situs (Tetap di atas) */
+        .site-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 15px;
+            background-color: var(--header-bg);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: 50px;
+        }
+
+        .site-header .logo {
+            width: 40px; /* Lebih kecil di detail */
+            height: 40px;
+            margin-right: 12px;
+        }
+
+        .site-header .site-title {
+            font-family: var(--heading-font);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        /* Gaya Artikel */
+        .article-header {
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+        }
+        .article-title {
+            font-family: var(--heading-font);
+            font-size: 2rem;
+            margin: 0 0 10px 0;
+            line-height: 1.3;
+        }
+        .article-meta {
+            font-size: .9rem;
+            color: #777;
+        }
+        .article-meta .category {
+            font-weight: 700;
+            color: var(--accent-color);
+            text-transform: capitalize;
+        }
+        .main-image {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background-color: #eee;
+        }
+        .article-content {
+            font-family: var(--primary-font); /* Gunakan primary-font */
+            line-height: 1.8;
+            font-size: 1.1rem;
+            color: var(--text-color); /* Gunakan text-color */
+        }
+        .article-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .article-content h1, .article-content h2, .article-content h3 {
+            font-family: var(--heading-font);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2rem;
+        }
+        
+        /* Navigasi Mobile (Fixed di bawah) */
+        #nav-wrapper {
+            position: fixed; 
+            bottom: 0; 
+            left: 0;
+            right: 0;
+            height: 65px;
+            background-color: var(--header-bg); 
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            z-index: 1001; 
+            display: flex; 
+            justify-content: space-around;
+            align-items: center;
+            border-top: none; 
+            padding: 0; 
+            margin: 0; 
+            width: 100%; 
+        }
+
+        .mobile-nav {
+            width: 100%; 
+            height: 100%;
+            display: flex; 
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .mobile-nav a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            color: #555; 
+            font-size: .75rem;
+            gap: 4px;
+            height: 100%;
+            text-decoration: none; /* Tambahkan ini jika belum ada */
+        }
+
+        .mobile-nav a i {
+            font-size: 1.4rem; /* Sesuaikan ukuran ikon */
+            margin-bottom: 2px;
+        }
+
+        .mobile-nav a.active {
+            color: var(--accent-color); 
+        }
+
+        /* Share Buttons */
+        .share-buttons { 
+            margin-top: 15px; 
+            margin-bottom: 15px; 
+            display: flex; 
+            gap: 15px; 
+            justify-content: center; 
+        } 
+        .share-buttons a { 
+            font-size: 1.8rem; 
+            color: #555; 
+        }
+
+        /* Footer (Statis, tidak fixed) */
+        .site-footer { 
+            background-color: #2c3e50; 
+            color: #ecf0f1; 
+            text-align: center; 
+            padding: 20px; 
+            margin-top: 40px; 
+            font-size: 0.9em; 
+            position: static; /* Pastikan tidak fixed */
+            box-shadow: none; /* Hapus bayangan jika ada */
+            padding-bottom: 20px; 
+        }
+        .footer-links { 
+            margin-bottom: 15px; 
+            display: flex; /* Untuk layout responsif */
+            flex-wrap: wrap; /* Untuk wrap link di mobile */
+            justify-content: center; /* Pusatkan link */
+            gap: 10px; /* Jarak antar link */
+        } 
+        .footer-links a { 
+            color: #fff; 
+            text-decoration: underline; 
+            margin: 0 5px; /* Sesuaikan margin */
+        }
+        .copyright { 
+            margin: 0; 
+            color: #bdc3c7; 
+        }
+
+        /* Overlay Menu Kategori (disalin dari index.html) */
+        .more-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1002;
+            display: none; /* Default hidden */
+            align-items: flex-end;
+            justify-content: center; 
+        }
+
+        .more-menu-overlay.visible {
+            display: flex;
+        }
+
+        .grid-menu-container {
+            background: #fff;
+            width: 100%;
+            max-width: 600px; 
+            padding: 20px;
+            border-radius: 16px 16px 0 0;
+            box-sizing: border-box;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.3s ease-out;
+        }
+
+        .more-menu-overlay.visible .grid-menu-container {
+            transform: translateY(0);
+        }
+
+        .grid-menu-container h2 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-family: var(--heading-font);
+        }
+        
+        /* Gaya Grid Kategori dalam Overlay (disalin dari index.html) */
+        #category-grid { 
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 2 kolom untuk mobile */
+            gap: 15px;
+            padding: 10px;
+        }
+
+        .category-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            overflow: hidden;
+            text-align: center;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .category-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .category-card img {
+            width: 100%;
+            height: 100px; 
+            object-fit: cover;
+            border-bottom: 1px solid var(--light-grey);
+        }
+
+        .category-card span {
+            display: block;
+            padding: 10px;
+            font-family: var(--heading-font);
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        /* Overlay Pencarian (disalin dari index.html) */
+        .search-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1002;
+            display: none; /* Default hidden */
+            align-items: flex-end;
+            justify-content: center; 
+        }
+
+        .search-overlay.visible {
+            display: flex;
+        }
+
+        .search-container {
+            background: #fff;
+            width: 100%;
+            max-width: 600px; 
+            padding: 20px;
+            border-radius: 16px 16px 0 0;
+            box-sizing: border-box;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.3s ease-out;
+        }
+
+        .search-overlay.visible .search-container {
+            transform: translateY(0);
+        }
+
+        .search-container h2 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-family: var(--heading-font);
+        }
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .search-button {
+            padding: 12px 20px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .search-results {
+            margin-top: 20px;
+        }
+
+        /* Media Queries (disalin dari index.html) */
+        @media (min-width: 600px) {
+            #category-grid {
+                grid-template-columns: 1fr 1fr 1fr; /* 3 kolom untuk tablet */
+            }
+        }
+
+        @media (min-width: 768px) {
+            #category-grid {
+                grid-template-columns: 1fr 1fr 1fr 1fr; /* 4 kolom untuk desktop kecil */
+            }
+        }
+
+        /* Gaya untuk Artikel Terkait */
+        .related-articles {
+            margin-top: 40px;
+            /* border-top: 1px solid #eee; */ /* Hapus atau sesuaikan jika Anda ingin garis yang lebih kental */
+            padding-top: 20px; /* Tambah padding agar ada jarak dari garis atas */
+        }
+        .related-articles h2 {
+            font-family: var(--heading-font);
+            font-size: 1.3rem; /* Font diperkecil */
+            text-align: left; /* Posisi di sebelah kiri */
+            margin-bottom: 15px; /* Kurangi margin bawah */
+            color: var(--primary-color);
+            padding-left: 5px; /* Sedikit padding agar tidak menempel pinggir */
+            border-bottom: 2px solid var(--accent-color); /* Garis tebal di bawah judul */
+            padding-bottom: 8px; /* Jarak antara judul dan garis */
+            display: inline-block; /* Agar border hanya sepanjang teks */
+            margin-right: auto; /* Untuk meratakan ke kiri di container flex/grid jika ada */
+        }
+        .related-articles-grid {
+            display: grid;
+            grid-template-columns: 1fr; /* Default 1 kolom untuk mobile */
+            gap: 20px;
+        }
+        @media (min-width: 600px) {
+            .related-articles-grid {
+                grid-template-columns: 1fr 1fr; /* 2 kolom untuk tablet */
+            }
+        }
+        .related-article-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            display: block; /* Agar link berfungsi sebagai blok */
+        }
+        .related-article-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .related-article-card img {
+            width: 100%;
+            height: 150px; /* Tinggi gambar artikel terkait */
+            object-fit: cover;
+            background-color: var(--light-grey);
+            display: block;
+        }
+        .related-article-card .content {
+            padding: 15px;
+        }
+        .related-article-card .title {
+            font-family: var(--heading-font);
+            font-size: 1.1rem;
+            margin: 0 0 8px 0;
+            line-height: 1.4;
+            color: var(--text-color);
+        }
+        .related-article-card .meta {
+            font-size: 0.8em;
+            color: var(--dark-grey);
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="index.html">
+            <img src="logo.png" alt="Logo Petungan" class="logo">
+        </a>
+        <a href="index.html">
+            <h1 class="site-title">Petungan</h1>
+        </a>
+    </header>
+    
+    <main class="container">
+        <div id="article-container" style="display:none;">
+            <header class="article-header">
+                <p class="article-meta"><span class="category" id="detail-category"></span> - <span id="detail-timestamp"></span></p>
+                <h1 class="article-title" id="detail-title"></h1>
+                <div class="share-buttons">
+                    <a href="#" id="share-facebook" aria-label="Bagikan ke Facebook" target="_blank"><i class="fab fa-facebook"></i></a>
+                    <a href="#" id="share-twitter" aria-label="Bagikan ke X (Twitter)" target="_blank"><i class="fab fa-x-twitter"></i></a>
+                    <a href="#" id="share-whatsapp" aria-label="Bagikan ke WhatsApp" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#" id="share-generic" aria-label="Bagikan"><i class="fas fa-share-alt"></i></a>
+                </div>
+                <p class="article-meta">Oleh: <strong id="detail-editor"></strong></p>
+            </header>
+            <div id="article-content" class="article-content"></div>
+
+            <div class="related-articles" id="related-articles-section">
+                <h2>Artikel Terkait</h2>
+                <div class="related-articles-grid" id="related-articles-grid">
+                    </div>
+                <p id="no-related-articles" style="text-align: center; display: none; color: var(--dark-grey);">Tidak ada artikel terkait lainnya dalam kategori ini.</p>
+            </div>
+            </div>
+        <div id="loading-container" class="loading"><p>Memuat berita...</p></div>
+    </main>
+
+    <div class="more-menu-overlay" id="more-menu-overlay">
+        <div class="grid-menu-container">
+            <h2>Kategori Berita</h2>
+            <div id="category-grid"></div>
+        </div>
+    </div>
+    
+    <div class="search-overlay" id="search-overlay">
+        <div class="search-container">
+            <h2>Cari Berita</h2>
+            <div class="search-form">
+                <input type="text" id="search-input" class="search-input" placeholder="Masukkan kata kunci...">
+                <button id="search-button" class="search-button">Cari</button>
+            </div>
+            <div id="search-results" class="search-results"></div>
+        </div>
+    </div>
+
+    <div id="nav-wrapper">
+        <nav class="mobile-nav">
+            <a href="index.html" class="active"><i class="fas fa-home"></i><span>Home</span></a>  
+            <a href="#" id="more-menu-btn"><i class="fas fa-th-large"></i><span>Kategori</span></a>
+            <a href="#" id="search-news-btn"><i class="fas fa-search"></i><span>Cari Berita</span></a>
+            <a href="#" id="latest-news-btn"><i class="fas fa-fire"></i><span>Berita Terbaru</span></a>
+        </nav>
+    </div>
+    
+    <footer class="site-footer">
+        <div class="footer-links">
+            <a href="halaman.html?id=tentang">Tentang Kami</a>
+            <a href="halaman.html?id=kontak">Kontak</a>
+            <a href="halaman.html?id=privasi">Kebijakan Privasi</a>
+        </div>
+        <p class="copyright">&copy; 2025 Petungan. Semua Hak Cipta Dilindungi.</p>
+    </footer>
+    
+    <script>
+        // Konstan dan Inisialisasi yang sama dengan index.html jika diperlukan oleh fungsi baru
+        // const NEWS_PER_PAGE = 30; // Tidak terpakai langsung di detail, tapi baik untuk konsistensi
+        // const db = firebase.firestore(); // Dinyatakan di awal, tidak perlu ulang di sini
+
+        function getFirstImageFromContent(htmlContent) { if (!htmlContent) return null; const match = htmlContent.match(/<img[^>]+src="([^">]+)"/); return match ? match[1] : null; }
+        
+        function formatCategoryName(slug) {
+            if (!slug || slug === 'undefined') return 'Umum';
+            return slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        }
+        
+        function initSocialShare(title) {
+            const currentUrl = window.location.href;
+            const encodedUrl = encodeURIComponent(currentUrl);
+            const shareText = encodeURIComponent(`Baca berita ini: ${title}`);
+            document.getElementById('share-facebook').href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+            document.getElementById('share-twitter').href = `https://twitter.com/intent/tweet?text=${shareText}&url=${encodedUrl}`;
+            document.getElementById('share-whatsapp').href = `https://api.whatsapp.com/send?text=${shareText} ${encodedUrl}`;
+            document.getElementById('share-generic').addEventListener('click', async (e) => {
+                e.preventDefault();
+                if (navigator.share) {
+                    try { await navigator.share({ title: title, text: `Baca berita: ${title}`, url: currentUrl }); }
+                    catch (err) { console.error('Gagal berbagi:', err); }
+                } else { alert('Fitur berbagi tidak didukung di browser ini.'); }
+            });
+        }
+
+        // Fungsi untuk memuat kategori (disalin dari index.html, sesuaikan jika ada perubahan di sana)
+        async function loadCategoriesForPopup() {
+            const container = document.getElementById('category-grid'); 
+            if (!container) {
+                console.error("Elemen #category-grid tidak ditemukan.");
+                return;
+            }
+
+            container.innerHTML = '<p style="text-align: center;">Memuat kategori...</p>';
+            try {
+                const mainCategoriesSnapshot = await db.collection('kategori').orderBy('nama').get();
+                
+                container.innerHTML = ''; 
+
+                if (mainCategoriesSnapshot.empty) {
+                    console.log("Koleksi 'kategori' kosong.");
+                    container.innerHTML = '<p style="text-align: center;">Belum ada kategori.</p>';
+                    return;
+                }
+
+                const allCategoriesToDisplay = [];
+
+                mainCategoriesSnapshot.forEach(doc => {
+                    const mainCategory = doc.data();
+                    if (mainCategory.slug && mainCategory.nama) {
+                        allCategoriesToDisplay.push({
+                            nama: mainCategory.nama,
+                            slug: mainCategory.slug,
+                            image: mainCategory.image 
+                        });
+                    }
+
+                    if (mainCategory.subkategori && Array.isArray(mainCategory.subkategori)) {
+                        mainCategory.subkategori.forEach(sub => {
+                            if (sub.slug && sub.nama_sub) { 
+                                allCategoriesToDisplay.push({
+                                    nama: sub.nama_sub, 
+                                    slug: sub.slug,
+                                    image: sub.image 
+                                });
+                            }
+                        });
+                    }
+                });
+
+                allCategoriesToDisplay.forEach((categoryData, index) => {
+                    const categoryCard = document.createElement('a');
+                    categoryCard.href = `index.html?kategori=${categoryData.slug}`; 
+                    categoryCard.className = 'category-card';
+                    
+                    const imageUrl = categoryData.image || `https://picsum.photos/300/200?random=${categoryData.slug || index}`; 
+                    categoryCard.innerHTML = `
+                        <img src="${imageUrl}" alt="${categoryData.nama || 'Kategori'}">
+                        <span>${categoryData.nama || 'Nama Kategori'}</span>
+                    `;
+                    container.appendChild(categoryCard);
+                });
+            } catch (error) { 
+                console.error("Gagal memuat kategori:", error); 
+                container.innerHTML = '<p style="color:red; text-align: center;">Gagal memuat kategori.</p>';
+            }
+        }
+
+        // Fungsi searchNews (disalin dari index.html)
+        async function searchNews(keyword) {
+            if (!keyword || keyword.trim() === '') {
+                document.getElementById('search-results').innerHTML = '<p style="color: red; text-align: center;">Silakan masukkan kata kunci pencarian.</p>';
+                return;
+            }
+            document.getElementById('search-overlay').classList.remove('visible');
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.value = '';
+            }
+            window.location.href = `index.html?cari=${encodeURIComponent(keyword)}`;
+        }
+
+        // Fungsi untuk membuat elemen kartu artikel terkait
+        function createRelatedArticleCard(news) {
+            const newsUrl = `detail.html?id=${news.id}`;
+            const imageUrl = getFirstImageFromContent(news.content) || `https://picsum.photos/300/150?random=${news.id}`; // Gambar lebih kecil
+            const element = document.createElement('a');
+            element.href = newsUrl;
+            element.className = 'related-article-card';
+
+            element.innerHTML = `
+                <img src="${imageUrl}" alt="${news.title || 'Gambar Artikel Terkait'}">
+                <div class="content">
+                    <h3 class="title">${news.title || 'Judul Artikel Terkait'}</h3>
+                    <p class="meta">Oleh: ${news.editor_name || 'Petungan'} - ${news.createdAt ? news.createdAt.toDate().toLocaleDateString('id-ID') : ''}</p>
+                </div>
+            `;
+            return element;
+        }
+
+        // Fungsi untuk memuat artikel terkait
+        async function loadRelatedArticles(currentArticleId, categorySlug) {
+            const relatedArticlesGrid = document.getElementById('related-articles-grid');
+            const noRelatedArticlesMsg = document.getElementById('no-related-articles');
+            relatedArticlesGrid.innerHTML = ''; // Bersihkan konten sebelumnya
+            noRelatedArticlesMsg.style.display = 'none';
+
+            if (!categorySlug) {
+                noRelatedArticlesMsg.textContent = 'Kategori tidak tersedia untuk mencari artikel terkait.';
+                noRelatedArticlesMsg.style.display = 'block';
+                return;
+            }
+
+            try {
+                // Ambil hingga 4 artikel lain dari kategori yang sama, tidak termasuk artikel saat ini
+                const snapshot = await db.collection('berita')
+                    .where('category', '==', categorySlug)
+                    .orderBy('createdAt', 'desc')
+                    .limit(5) // Ambil 5, nanti filter yang sedang dibuka
+                    .get();
+
+                const relatedArticles = [];
+                snapshot.forEach(doc => {
+                    if (doc.id !== currentArticleId) { // Pastikan bukan artikel yang sedang dilihat
+                        relatedArticles.push({ id: doc.id, ...doc.data() });
+                    }
+                });
+
+                if (relatedArticles.length === 0) {
+                    noRelatedArticlesMsg.textContent = 'Tidak ada artikel terkait lainnya dalam kategori ini.';
+                    noRelatedArticlesMsg.style.display = 'block';
+                } else {
+                    relatedArticles.slice(0, 4).forEach(news => { // Tampilkan maksimal 4
+                        relatedArticlesGrid.appendChild(createRelatedArticleCard(news));
+                    });
+                }
+
+            } catch (error) {
+                console.error("Gagal memuat artikel terkait:", error);
+                noRelatedArticlesMsg.textContent = 'Gagal memuat artikel terkait. Silakan coba lagi.';
+                noRelatedArticlesMsg.style.display = 'block';
+            }
+        }
+
+        async function getNewsDetail(){
+            const params = new URLSearchParams(window.location.search);
+            const newsId = params.get("id");
+            const loadingContainer = document.getElementById("loading-container");
+            const relatedArticlesSection = document.getElementById('related-articles-section'); // Ambil section artikel terkait
+
+            if(!newsId) {
+                loadingContainer.innerHTML='<p style="color:red;">Error: ID Berita tidak ditemukan.</p>';
+                relatedArticlesSection.style.display = 'none'; // Sembunyikan bagian terkait jika ada error
+                return;
+            }
+
+            try {
+                const docSnap = await db.collection("berita").doc(newsId).get();
+                if(docSnap.exists){
+                    const data = docSnap.data();
+                    
+                    const articleTitle = data.title || "Judul tidak tersedia";
+                    const articleDescription = data.content ? data.content.replace(/<[^>]*>/g, "").substring(0, 155) + '...' : 'Baca selengkapnya di situs Petungan.';
+                    const articleImage = getFirstImageFromContent(data.content) || `https://petungan.github.io/petungan-News/logo.png`;
+                    const currentUrl = window.location.href;
+                    
+                    document.title = articleTitle;
+                    document.querySelector('meta[name="description"]').setAttribute("content", articleDescription);
+                    document.querySelector('meta[property="og:title"]').setAttribute("content", articleTitle);
+                    document.querySelector('meta[property="og:description"]').setAttribute("content", articleDescription);
+                    document.querySelector('meta[property="og:image"]').setAttribute("content", articleImage);
+                    document.querySelector('meta[property="og:url"]').setAttribute("content", currentUrl);
+                    document.querySelector('meta[name="twitter:title"]').setAttribute("content", articleTitle);
+                    document.querySelector('meta[name="twitter:description"]').setAttribute("content", articleDescription);
+                    document.querySelector('meta[name="twitter:image"]').setAttribute("content", articleImage);
+
+                    document.getElementById("detail-title").textContent = articleTitle;
+                    document.getElementById("detail-category").textContent = formatCategoryName(data.category);
+                    document.getElementById("detail-editor").textContent = data.editor_name;
+                    if (data.createdAt && data.createdAt.toDate) {
+                        document.getElementById("detail-timestamp").textContent = data.createdAt.toDate().toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"});
+                    }
+                    
+                    document.getElementById("article-content").innerHTML = data.content || '<p>Konten tidak tersedia.</p>';
+                    
+                    document.getElementById("article-container").style.display = "block";
+                    loadingContainer.style.display = "none";
+                    
+                    initSocialShare(articleTitle);
+                    
+                    // Panggil fungsi untuk memuat artikel terkait
+                    loadRelatedArticles(newsId, data.category);
+
+                } else {
+                    loadingContainer.innerHTML='<p style="color:red;">Berita tidak ditemukan.</p>';
+                    relatedArticlesSection.style.display = 'none'; // Sembunyikan bagian terkait jika berita tidak ditemukan
+                }
+            } catch(e) {
+                console.error("Error:",e);
+                loadingContainer.innerHTML='<p style="color:red;">Gagal memuat berita.</p>';
+                relatedArticlesSection.style.display = 'none'; // Sembunyikan bagian terkait jika ada error
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            getNewsDetail();
+
+            // Event listener untuk tombol navigasi (disalin dari index.html)
+            document.getElementById('more-menu-btn').addEventListener('click', (e) => { 
+                e.preventDefault(); 
+                loadCategoriesForPopup(); 
+                document.getElementById('more-menu-overlay').classList.add('visible'); 
+                document.querySelectorAll('.mobile-nav a').forEach(link => link.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+            });
+
+            document.getElementById('more-menu-overlay').addEventListener('click', (e) => { 
+                if (e.target === document.getElementById('more-menu-overlay')) { 
+                    document.getElementById('more-menu-overlay').classList.remove('visible'); 
+                } 
+            });
+
+            document.getElementById('search-news-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('search-overlay').classList.add('visible');
+                document.querySelectorAll('.mobile-nav a').forEach(link => link.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                document.getElementById('search-input').focus();
+            });
+            
+            document.getElementById('search-overlay').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('search-overlay')) {
+                    document.getElementById('search-overlay').classList.remove('visible');
+                }
+            });
+            
+            document.getElementById('search-button').addEventListener('click', () => {
+                const keyword = document.getElementById('search-input').value.trim();
+                searchNews(keyword);
+            });
+            
+            document.getElementById('search-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') { const keyword = document.getElementById('search-input').value.trim(); searchNews(keyword); }
+            });
+            
+            document.getElementById('latest-news-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.mobile-nav a').forEach(link => link.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                window.location.href = 'index.html?terbaru=true';
+            });
+
+            // Atur active class untuk Home secara default di detail.html
+            document.querySelector('.mobile-nav a[href="index.html"]').classList.add('active');
+        });
+    </script>
+</body>
+</html>
