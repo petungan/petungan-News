@@ -236,7 +236,7 @@
             right: 0;
             height: 65px;
             background-color: var(--header-bg); 
-            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             z-index: 1001; 
             display: flex; 
             justify-content: space-around;
@@ -320,14 +320,14 @@
         .desktop-search-icon-wrapper {
             display: none; /* Sembunyikan secara default */
             position: absolute; /* Posisi absolut */
-            right: 15px; /* Dari kanan container */
-            top: 85px; /* Di bawah header, sejajar dengan nav */
+            right: 30px; /* Dari kanan halaman */
+            top: 80px; /* Di bawah header */
             z-index: 1000;
         }
 
         .desktop-search-icon {
             color: #555;
-            font-size: 1.5rem;
+            font-size: 1.5rem; /* Ukuran ikon */
             cursor: pointer;
             padding: 5px; /* Area klik */
         }
@@ -613,6 +613,7 @@
                 display: block; /* Tampilkan navigasi desktop */
                 position: sticky; /* Sticky di desktop */
                 top: 70px; /* Di bawah header (50px) + sedikit jarak */
+                /* Z-index 999, border-radius 8px, box-shadow sudah ada */
             }
             .site-header {
                 height: 70px; /* Beri sedikit lebih banyak ruang untuk header di desktop */
@@ -657,11 +658,11 @@
     <div class="desktop-nav-wrapper">
         <nav class="desktop-nav" id="desktop-main-nav">
             <a href="index.html" id="desktop-home-btn"><i class="fas fa-home"></i><span>Home</span></a>  
-            <a href="#" id="desktop-latest-news-btn"><i class="fas fa-fire"></i><span>Berita Terbaru</span></a>
+            <a href="index.html?terbaru=true" id="desktop-latest-news-btn"><i class="fas fa-fire"></i><span>Berita Terbaru</span></a>
         </nav>
     </div>
     <div class="desktop-search-icon-wrapper">
-        <a href="#" id="desktop-search-news-btn" class="desktop-search-icon"><i class="fas fa-search"></i></a>
+        <a href="#" id="desktop-search-news-btn-icon" class="desktop-search-icon"><i class="fas fa-search"></i></a>
     </div>
     <main class="container">
         <div class="news-feed" id="news-feed-container">
@@ -1025,11 +1026,19 @@
         // FUNGSI BARU: Memuat kategori ke navigasi desktop
         async function loadCategoriesForDesktopNav() {
             const desktopMainNav = document.getElementById('desktop-main-nav');
-            // Hapus tombol Kategori yang lama jika ada
-            const desktopCategoryBtn = document.getElementById('desktop-more-menu-btn');
-            if (desktopCategoryBtn) {
-                desktopCategoryBtn.remove();
-            }
+            // Hapus tombol Kategori yang lama jika ada (sudah tidak relevan dengan struktur baru)
+            // desktopOldCategoryBtn = document.getElementById('desktop-more-menu-btn'); // Ini ID untuk tombol Kategori mobile
+            // if (desktopOldCategoryBtn) { // Pastikan elemennya ada sebelum dihapus
+            //      desktopOldCategoryBtn.remove();
+            // }
+
+            // Clear previous categories to prevent duplicates on re-load
+            desktopMainNav.querySelectorAll('.dynamic-category-link').forEach(el => el.remove());
+            const allCategoriesBtn = document.getElementById('desktop-all-categories-btn');
+            if (allCategoriesBtn) allCategoriesBtn.remove();
+            const fallbackCategoryBtn = document.getElementById('desktop-fallback-category-btn');
+            if (fallbackCategoryBtn) fallbackCategoryBtn.remove();
+
 
             try {
                 const mainCategoriesSnapshot = await db.collection('kategori').orderBy('nama').get();
@@ -1045,33 +1054,49 @@
                     }
                 });
 
-                // Tampilkan maksimal sekitar 5-7 kategori utama langsung di nav, sisanya bisa di "Semua Kategori"
                 const maxCategoriesToShow = 6; 
                 let categoriesRendered = 0;
-
+                
+                // Tambahkan kategori spesifik
                 for (const categoryData of categoriesToAdd) {
-                    if (categoriesRendered >= maxCategoriesToShow) break; // Batasi jumlah yang ditampilkan
+                    if (categoriesRendered >= maxCategoriesToShow) break; 
                     const link = document.createElement('a');
                     link.href = `index.html?kategori=${categoryData.slug}`;
-                    link.id = `desktop-category-${categoryData.slug}-btn`; // Tambahkan ID untuk active state
-                    link.textContent = categoryData.nama; // Hanya teks kategori
-                    desktopMainNav.insertBefore(link, document.getElementById('desktop-latest-news-btn')); // Masukkan sebelum Berita Terbaru
+                    link.id = `desktop-category-${categoryData.slug}-btn`; 
+                    link.textContent = categoryData.nama; 
+                    link.classList.add('dynamic-category-link'); // Tambahkan kelas untuk identifikasi
+
+                    const latestNewsBtn = document.getElementById('desktop-latest-news-btn');
+                    if (latestNewsBtn) {
+                        desktopMainNav.insertBefore(link, latestNewsBtn); // Masukkan sebelum Berita Terbaru
+                    } else {
+                        desktopMainNav.appendChild(link); 
+                    }
                     categoriesRendered++;
                 }
 
                 // Tambahkan tombol "Semua Kategori" jika ada kategori yang tersembunyi
                 if (categoriesToAdd.length > maxCategoriesToShow) {
                     const allCategoriesLink = document.createElement('a');
-                    allCategoriesLink.href = '#'; // Tidak langsung ke halaman, tapi buka overlay
+                    allCategoriesLink.href = '#'; 
                     allCategoriesLink.id = 'desktop-all-categories-btn';
                     allCategoriesLink.textContent = 'Semua Kategori';
+                    allCategoriesLink.classList.add('dynamic-category-link'); // Tambahkan kelas untuk identifikasi
                     allCategoriesLink.addEventListener('click', (e) => {
                         e.preventDefault();
-                        loadCategoriesForPopup(); // Buka overlay kategori
+                        loadCategoriesForPopup(); 
                         document.getElementById('more-menu-overlay').classList.add('visible');
                     });
-                    desktopMainNav.insertBefore(allCategoriesLink, document.getElementById('desktop-latest-news-btn'));
+                    const latestNewsBtn = document.getElementById('desktop-latest-news-btn');
+                    if (latestNewsBtn) {
+                        desktopMainNav.insertBefore(allCategoriesLink, latestNewsBtn); // Masukkan sebelum Berita Terbaru
+                    } else {
+                        desktopMainNav.appendChild(allCategoriesLink);
+                    }
                 }
+                
+                // Panggil active state setelah kategori dinamis dimuat
+                activateNavButtons('desktop-');
 
             } catch (error) {
                 console.error("Gagal memuat kategori untuk navigasi desktop:", error);
@@ -1080,12 +1105,13 @@
                 fallbackCategoryLink.href = '#';
                 fallbackCategoryLink.id = 'desktop-fallback-category-btn';
                 fallbackCategoryLink.textContent = 'Kategori'; // Teks default jika error
-                fallbackCategoryLink.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    loadCategoriesForPopup();
-                    document.getElementById('more-menu-overlay').classList.add('visible');
-                });
-                desktopMainNav.insertBefore(fallbackCategoryLink, document.getElementById('desktop-latest-news-btn'));
+                fallbackCategoryLink.classList.add('dynamic-category-link'); // Tambahkan kelas untuk identifikasi
+                const latestNewsBtn = document.getElementById('desktop-latest-news-btn');
+                if (latestNewsBtn) {
+                    desktopMainNav.insertBefore(fallbackCategoryLink, latestNewsBtn);
+                } else {
+                    desktopMainNav.appendChild(fallbackCategoryLink);
+                }
             }
         }
 
@@ -1104,6 +1130,10 @@
             loadCategoriesForDesktopNav(); // Panggil fungsi baru ini
 
             // Event listener untuk Navigasi Mobile (sudah ada)
+            document.getElementById('mobile-home-btn').addEventListener('click', (e) => { 
+                e.preventDefault(); 
+                window.location.href = 'index.html';
+            });
             document.getElementById('mobile-more-menu-btn').addEventListener('click', (e) => { 
                 e.preventDefault(); 
                 loadCategoriesForPopup(); 
@@ -1147,9 +1177,9 @@
             
             document.getElementById('mobile-latest-news-btn').addEventListener('click', (e) => {
                 e.preventDefault();
+                window.location.href = 'index.html?terbaru=true';
                 document.querySelectorAll('.mobile-nav a').forEach(link => link.classList.remove('active'));
                 e.currentTarget.classList.add('active');
-                window.location.href = 'index.html?terbaru=true';
             });
 
 
@@ -1160,8 +1190,8 @@
             });
 
             // Event listener untuk tombol pencarian desktop (ikon di kanan atas)
-            const desktopSearchIconBtn = document.getElementById('desktop-search-news-btn-icon'); // ID baru untuk ikon
-            if (desktopSearchIconBtn) { // Pastikan elemennya ada
+            const desktopSearchIconBtn = document.getElementById('desktop-search-news-btn-icon'); 
+            if (desktopSearchIconBtn) { 
                 desktopSearchIconBtn.addEventListener('click', (e) => {
                     e.preventDefault();
                     document.getElementById('search-overlay').classList.add('visible');
@@ -1197,6 +1227,8 @@
                 } else if (urlParams.has('cari')) {
                     if (document.getElementById(prefix + 'search-news-btn')) {
                         document.getElementById(prefix + 'search-news-btn').classList.add('active');
+                    } else if (document.getElementById(`${prefix}search-news-btn-icon`)) { // Untuk ikon pencarian desktop
+                        document.getElementById(`${prefix}search-news-btn-icon`).classList.add('active');
                     }
                 } else if (urlParams.has('terbaru')) {
                     if (document.getElementById(prefix + 'latest-news-btn')) {
