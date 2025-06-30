@@ -874,6 +874,13 @@
             const match = htmlContent.match(/<img[^>]+src="([^">]+)"/);
             return match ? match[1] : null;
         }
+        // Hilangkan tag <img> pertama dari konten
+        function removeFirstImageTag(htmlContent) {
+            if (!htmlContent) return htmlContent;
+            // Hapus hanya IMG pertama
+            return htmlContent.replace(/<img[^>]*?>/, '');
+        }
+    
 
         function formatCategoryName(slug) {
             if (!slug || slug === 'undefined') return 'Umum';
@@ -940,7 +947,8 @@
 
                 if (doc.exists) {
                     const news = doc.data();
-                    detailPageTitle.textContent = news.title || 'Detail Berita';
+                                const cleanedContent = removeFirstImageTag(news.content);
+detailPageTitle.textContent = news.title || 'Detail Berita';
 
                     const mainImageUrl = getFirstImageFromContent(news.content) || `https://picsum.photos/1200/600?random=${news.id}`;
                     const currentUrl = window.location.href;
@@ -953,7 +961,7 @@
                             ${socialShareButtons}
                         </p>
                         <img src="${mainImageUrl}" alt="${news.title || 'Gambar Berita'}" class="article-image">
-                        <div class="article-content">${news.content || '<p>Konten berita tidak tersedia.</p>'}</div>
+                        <div class="article-content">${cleanedContent || '<p>Konten berita tidak tersedia.</p>'}</div>
                     `;
 
                     // Load related news based on category
