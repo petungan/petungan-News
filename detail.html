@@ -3,8 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title id="detail-page-title">Memuat Berita...</title>
-
+    <meta name="description" content="Sebuah artikel dari situs Petungan.">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="Petungan">
+    <meta property="og:title" content="Petungan" />
+    <meta property="og:description" content="Sebuah artikel dari situs Petungan." />
+    <meta property="og:image" content="https://petungan.github.io/petungan-News/logo.png" />
+    <meta property="og:url" content="https://petungan.github.io/petungan-News/" />
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Petungan">
+    <meta name="twitter:description" content="Sebuah artikel dari situs Petungan.">
+    <meta name="twitter:image" content="https://petungan.github.io/petungan-News/logo.png">
+    
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     <script>
@@ -388,7 +400,7 @@
             height: 100%;
             background: rgba(0,0,0,0.5);
             z-index: 1002;
-            display: none;
+            display: none; 
             align-items: flex-end;
             justify-content: center; 
         }
@@ -953,7 +965,6 @@
 
             container.innerHTML = '<p style="text-align: center;">Memuat kategori...</p>';
             try {
-                // Ambil semua dokumen kategori utama
                 const mainCategoriesSnapshot = await db.collection('kategori').orderBy('nama').get();
                 
                 container.innerHTML = ''; 
@@ -964,12 +975,10 @@
                     return;
                 }
 
-                // Kumpulkan semua kategori (utama dan sub) untuk ditampilkan di grid
                 const allCategoriesToDisplay = [];
 
                 mainCategoriesSnapshot.forEach(doc => {
                     const mainCategory = doc.data();
-                    // Tambahkan kategori utama jika Anda ingin tampilkan sebagai kartu di grid
                     if (mainCategory.slug && mainCategory.nama) {
                         allCategoriesToDisplay.push({
                             nama: mainCategory.nama,
@@ -978,7 +987,6 @@
                         });
                     }
 
-                    // Tambahkan subkategori dari array jika ada
                     if (mainCategory.subkategori && Array.isArray(mainCategory.subkategori)) {
                         mainCategory.subkategori.forEach(sub => {
                             if (sub.slug && sub.nama_sub) { 
