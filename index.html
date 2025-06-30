@@ -236,7 +236,7 @@
             right: 0;
             height: 65px;
             background-color: var(--header-bg); 
-            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             z-index: 1001; 
             display: flex; 
             justify-content: space-around;
@@ -270,6 +270,72 @@
         .mobile-nav a.active {
             color: var(--accent-color); 
         }
+
+        /* Navigasi Desktop */
+        .desktop-nav-wrapper {
+            display: none; /* Sembunyikan secara default di mobile */
+            background-color: var(--header-bg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 20px; /* Jarak antara nav dan konten */
+            padding: 0 15px; /* Padding horizontal */
+            position: sticky; /* Sticky di desktop */
+            top: 70px; /* Di bawah header (50px) + sedikit jarak */
+            z-index: 999; /* Di bawah header, di atas konten */
+            border-radius: 8px; /* Border radius */
+        }
+
+        .desktop-nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: flex-start; /* Pindah ke kiri */
+            align-items: center;
+            height: 50px; /* Tinggi navigasi desktop */
+            gap: 15px; /* Jarak antar item nav */
+        }
+
+        .desktop-nav a {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            color: #555;
+            font-size: 0.95rem;
+            font-weight: 500;
+            gap: 8px;
+            transition: color 0.2s ease, background-color 0.2s ease;
+            border-radius: 4px;
+            white-space: nowrap; /* Pastikan teks tidak pecah baris */
+        }
+
+        .desktop-nav a:hover {
+            color: var(--accent-color);
+            background-color: var(--light-grey);
+        }
+
+        .desktop-nav a.active {
+            color: var(--accent-color);
+        }
+
+        /* Search Icon di Desktop Nav (pindah ke kanan atas) */
+        .desktop-search-icon-wrapper {
+            display: none; /* Sembunyikan secara default */
+            position: absolute; /* Posisi absolut */
+            right: 30px; /* Dari kanan halaman */
+            top: 80px; /* Di bawah header */
+            z-index: 1000;
+        }
+
+        .desktop-search-icon {
+            color: #555;
+            font-size: 1.5rem; /* Ukuran ikon */
+            cursor: pointer;
+            padding: 5px; /* Area klik */
+        }
+        .desktop-search-icon:hover {
+            color: var(--accent-color);
+        }
+        /* Akhir Navigasi Desktop */
+
 
         /* Overlay Menu Kategori */
         .more-menu-overlay {
@@ -534,6 +600,39 @@
             #category-grid {
                 grid-template-columns: 1fr 1fr 1fr 1fr; /* 4 kolom untuk desktop kecil */
             }
+
+            /* Desktop Specific Adjustments */
+            body {
+                padding-top: 120px; /* Header (70px) + Desktop Nav (50px) */
+                padding-bottom: 40px; /* Footer tidak fixed di desktop, kurangi padding */
+            }
+            #nav-wrapper {
+                display: none; /* Sembunyikan navigasi mobile di desktop */
+            }
+            .desktop-nav-wrapper {
+                display: block; /* Tampilkan navigasi desktop */
+                position: sticky; /* Sticky di desktop */
+                top: 70px; /* Di bawah header (50px) + sedikit jarak */
+                /* Z-index 999, border-radius 8px, box-shadow sudah ada */
+            }
+            .site-header {
+                height: 70px; /* Beri sedikit lebih banyak ruang untuk header di desktop */
+            }
+            .site-header .logo {
+                width: 60px; /* Ukuran logo di desktop */
+                height: 60px;
+            }
+            .site-header .site-title {
+                font-size: 1.8rem; /* Ukuran judul di desktop */
+            }
+            /* Search Icon di Desktop Nav (pindah ke kanan atas) */
+            .desktop-search-icon-wrapper {
+                display: block; /* Tampilkan di desktop */
+                position: absolute; /* Posisi absolut */
+                right: 30px; /* Dari kanan halaman */
+                top: 80px; /* Di bawah header */
+                z-index: 1000;
+            }
         }
 
         @media (min-width: 992px) {
@@ -552,10 +651,19 @@
             <img src="logo.png" alt="Logo Petungan" class="logo">
         </a>
         <a href="index.html">
-            <h1 id="site-title" class="site-title">Petungan</h1>
+            <h1 class="site-title">Petungan</h1>
         </a>
     </header>
 
+    <div class="desktop-nav-wrapper">
+        <nav class="desktop-nav" id="desktop-main-nav">
+            <a href="index.html" id="desktop-home-btn"><i class="fas fa-home"></i><span>Home</span></a>  
+            <a href="index.html?terbaru=true" id="desktop-latest-news-btn"><i class="fas fa-fire"></i><span>Berita Terbaru</span></a>
+        </nav>
+    </div>
+    <div class="desktop-search-icon-wrapper">
+        <a href="#" id="desktop-search-news-btn-icon" class="desktop-search-icon"><i class="fas fa-search"></i></a>
+    </div>
     <main class="container">
         <div class="news-feed" id="news-feed-container">
             <p>Memuat berita...</p>
@@ -586,10 +694,10 @@
     </div>
     
     <div id="nav-wrapper"> <nav class="mobile-nav">
-            <a href="index.html" class="active"><i class="fas fa-home"></i><span>Home</span></a>  
-            <a href="#" id="more-menu-btn"><i class="fas fa-th-large"></i><span>Kategori</span></a>
-            <a href="#" id="search-news-btn"><i class="fas fa-search"></i><span>Cari Berita</span></a>
-            <a href="#" id="latest-news-btn"><i class="fas fa-fire"></i><span>Berita Terbaru</span></a>
+            <a href="index.html" id="mobile-home-btn"><i class="fas fa-home"></i><span>Home</span></a>  
+            <a href="#" id="mobile-more-menu-btn"><i class="fas fa-th-large"></i><span>Kategori</span></a>
+            <a href="#" id="mobile-search-news-btn"><i class="fas fa-search"></i><span>Cari Berita</span></a>
+            <a href="#" id="mobile-latest-news-btn"><i class="fas fa-fire"></i><span>Berita Terbaru</span></a>
         </nav>
     </div>
     
@@ -738,6 +846,7 @@
                    document.getElementById('site-title').textContent = formatCategoryName(categoryFilter);
                 } else if (showLatest === 'true') {
                     document.getElementById('site-title').textContent = 'Berita Terbaru';
+                    // Clear search input if navigating to 'Terbaru'
                     const searchInput = document.getElementById('search-input');
                     if (searchInput) searchInput.value = '';
                 } else if (searchQuery) {
@@ -914,6 +1023,75 @@
             }
         }
 
+        // FUNGSI BARU: Memuat kategori ke navigasi desktop
+        async function loadCategoriesForDesktopNav() {
+            const desktopMainNav = document.getElementById('desktop-main-nav');
+            // Hapus tombol Kategori yang lama jika ada
+            const desktopCategoryBtn = document.getElementById('desktop-more-menu-btn'); // Ini ID untuk tombol Kategori mobile
+            if (desktopCategoryBtn) {
+                // desktopCategoryBtn.remove(); // Jangan hapus jika itu tombol mobile
+            }
+
+            try {
+                const mainCategoriesSnapshot = await db.collection('kategori').orderBy('nama').get();
+                const categoriesToAdd = [];
+
+                mainCategoriesSnapshot.forEach(doc => {
+                    const mainCategory = doc.data();
+                    if (mainCategory.slug && mainCategory.nama) {
+                        categoriesToAdd.push({
+                            nama: mainCategory.nama,
+                            slug: mainCategory.slug
+                        });
+                    }
+                });
+
+                const maxCategoriesToShow = 6; 
+                let categoriesRendered = 0;
+
+                // Tambahkan link "Semua Kategori" di awal jika ada kategori yang tersembunyi
+                if (categoriesToAdd.length > maxCategoriesToShow) {
+                    const allCategoriesLink = document.createElement('a');
+                    allCategoriesLink.href = '#'; 
+                    allCategoriesLink.id = 'desktop-all-categories-btn';
+                    allCategoriesLink.textContent = 'Semua Kategori';
+                    allCategoriesLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        loadCategoriesForPopup(); 
+                        document.getElementById('more-menu-overlay').classList.add('visible');
+                    });
+                    desktopMainNav.appendChild(allCategoriesLink); // Tambahkan di akhir setelah kategori spesifik
+                }
+
+
+                // Tambahkan kategori spesifik
+                for (const categoryData of categoriesToAdd) {
+                    if (categoriesRendered >= maxCategoriesToShow) break; 
+                    const link = document.createElement('a');
+                    link.href = `index.html?kategori=${categoryData.slug}`;
+                    link.id = `desktop-category-${categoryData.slug}-btn`; 
+                    link.textContent = categoryData.nama; 
+                    desktopMainNav.appendChild(link); // Tambahkan di akhir nav
+                    categoriesRendered++;
+                }
+
+            } catch (error) {
+                console.error("Gagal memuat kategori untuk navigasi desktop:", error);
+                // Tambahkan tombol default jika gagal memuat kategori
+                const fallbackCategoryLink = document.createElement('a');
+                fallbackCategoryLink.href = '#';
+                fallbackCategoryLink.id = 'desktop-fallback-category-btn';
+                fallbackCategoryLink.textContent = 'Kategori'; // Teks default jika error
+                fallbackCategoryLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    loadCategoriesForPopup();
+                    document.getElementById('more-menu-overlay').classList.add('visible');
+                });
+                desktopMainNav.appendChild(fallbackCategoryLink);
+            }
+        }
+
+
         // --- EVENT LISTENERS ---
         document.getElementById('next-page-btn').addEventListener('click', () => {
             fetchNews('next');
@@ -925,9 +1103,10 @@
         
         document.addEventListener('DOMContentLoaded', () => {
             fetchNews('current'); 
-            
-            // Tombol Kategori (navigasi mobile)
-            document.getElementById('more-menu-btn').addEventListener('click', (e) => { 
+            loadCategoriesForDesktopNav(); // Panggil fungsi baru ini
+
+            // Event listener untuk Navigasi Mobile (sudah ada)
+            document.getElementById('mobile-more-menu-btn').addEventListener('click', (e) => { 
                 e.preventDefault(); 
                 loadCategoriesForPopup(); 
                 document.getElementById('more-menu-overlay').classList.add('visible'); 
@@ -942,8 +1121,7 @@
                 } 
             });
 
-            // Tombol Cari Berita (navigasi mobile)
-            document.getElementById('search-news-btn').addEventListener('click', (e) => {
+            document.getElementById('mobile-search-news-btn').addEventListener('click', (e) => {
                 e.preventDefault();
                 document.getElementById('search-overlay').classList.add('visible');
                 document.querySelectorAll('.mobile-nav a').forEach(link => link.classList.remove('active'));
@@ -951,20 +1129,17 @@
                 document.getElementById('search-input').focus();
             });
             
-            // Tombol Tutup Pencarian
             document.getElementById('search-overlay').addEventListener('click', (e) => {
                 if (e.target === document.getElementById('search-overlay')) {
                     document.getElementById('search-overlay').classList.remove('visible');
                 }
             });
             
-            // Tombol Submit Pencarian
             document.getElementById('search-button').addEventListener('click', () => {
                 const keyword = document.getElementById('search-input').value.trim();
                 searchNews(keyword);
             });
             
-            // Enter pada input pencarian
             document.getElementById('search-input').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     const keyword = document.getElementById('search-input').value.trim();
@@ -972,25 +1147,71 @@
                 }
             });
             
-            // Tombol Berita Terbaru (navigasi mobile)
-            document.getElementById('latest-news-btn').addEventListener('click', (e) => {
+            document.getElementById('mobile-latest-news-btn').addEventListener('click', (e) => {
                 e.preventDefault();
                 document.querySelectorAll('.mobile-nav a').forEach(link => link.classList.remove('active'));
                 e.currentTarget.classList.add('active');
                 window.location.href = 'index.html?terbaru=true';
             });
 
-            // Handle initial active class based on URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            if (!urlParams.has('kategori') && !urlParams.has('cari') && !urlParams.has('terbaru')) {
-                document.querySelector('.mobile-nav a[href="index.html"]').classList.add('active');
-            } else if (urlParams.has('kategori')) {
-                document.getElementById('more-menu-btn').classList.add('active');
-            } else if (urlParams.has('cari')) {
-                document.getElementById('search-news-btn').classList.add('active');
-            } else if (urlParams.has('terbaru')) {
-                document.getElementById('latest-news-btn').classList.add('active');
+
+            // Event listener untuk Navigasi Desktop (yang baru)
+            document.getElementById('desktop-home-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                window.location.href = 'index.html'; // Arahkan ke home
+            });
+
+            // Event listener untuk tombol pencarian desktop (ikon di kanan atas)
+            const desktopSearchIconBtn = document.getElementById('desktop-search-news-btn-icon'); 
+            if (desktopSearchIconBtn) { 
+                desktopSearchIconBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.getElementById('search-overlay').classList.add('visible');
+                    document.getElementById('search-input').focus();
+                });
             }
+
+            document.getElementById('desktop-latest-news-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                window.location.href = 'index.html?terbaru=true';
+            });
+
+
+            // Handle initial active class based on URL parameters for BOTH mobile and desktop nav
+            const urlParams = new URLSearchParams(window.location.search);
+            const activateNavButtons = (prefix) => {
+                document.querySelectorAll('.mobile-nav a, .desktop-nav a').forEach(link => link.classList.remove('active'));
+                const currentCategorySlug = urlParams.get('kategori');
+
+                if (!urlParams.has('kategori') && !urlParams.has('cari') && !urlParams.has('terbaru')) {
+                    if (document.getElementById(prefix + 'home-btn')) {
+                         document.getElementById(prefix + 'home-btn').classList.add('active');
+                    }
+                } else if (urlParams.has('kategori')) {
+                    // Aktifkan link kategori spesifik di desktop nav
+                    if (currentCategorySlug && document.getElementById(`${prefix}category-${currentCategorySlug}-btn`)) {
+                        document.getElementById(`${prefix}category-${currentCategorySlug}-btn`).classList.add('active');
+                    } else if (document.getElementById(`${prefix}more-menu-btn`)) { // Jika tidak ada kategori spesifik (mobile)
+                        document.getElementById(`${prefix}more-menu-btn`).classList.add('active');
+                    } else if (document.getElementById(`${prefix}all-categories-btn`)) { // Jika ada tombol "Semua Kategori" di desktop
+                        document.getElementById(`${prefix}all-categories-btn`).classList.add('active');
+                    }
+                } else if (urlParams.has('cari')) {
+                    if (document.getElementById(prefix + 'search-news-btn')) {
+                        document.getElementById(prefix + 'search-news-btn').classList.add('active');
+                    } else if (document.getElementById(`${prefix}search-news-btn-icon`)) { // Untuk ikon pencarian desktop
+                        document.getElementById(`${prefix}search-news-btn-icon`).classList.add('active');
+                    }
+                } else if (urlParams.has('terbaru')) {
+                    if (document.getElementById(prefix + 'latest-news-btn')) {
+                        document.getElementById(prefix + 'latest-news-btn').classList.add('active');
+                    }
+                }
+            };
+            activateNavButtons('mobile-'); // Untuk mobile nav
+            activateNavButtons('desktop-'); // Untuk desktop nav
+
+
         });
 
         // SERVICE WORKER
