@@ -262,7 +262,7 @@
             height: 100%;
             background: rgba(0,0,0,0.5);
             z-index: 1002;
-            display: none;
+            display: none; 
             align-items: flex-end;
             justify-content: center; 
         }
@@ -405,28 +405,29 @@
         /* Media Queries */
         @media (min-width: 600px) {
             #category-grid {
-                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-columns: 1fr 1fr 1fr; /* 3 kolom untuk tablet */
             }
         }
 
         @media (min-width: 768px) {
             #category-grid {
-                grid-template-columns: 1fr 1fr 1fr 1fr;
+                grid-template-columns: 1fr 1fr 1fr 1fr; /* 4 kolom untuk desktop kecil */
             }
+            /* Desktop Specific Adjustments */
             body {
-                padding-top: 120px;
-                padding-bottom: 40px;
+                padding-top: 120px; /* Header (70px) + Desktop Nav (50px) */
+                padding-bottom: 40px; /* Footer tidak fixed di desktop, kurangi padding */
             }
             #nav-wrapper {
-                display: none;
+                display: none; /* Sembunyikan navigasi mobile di desktop */
             }
             .desktop-nav-wrapper {
-                display: block;
-                position: sticky;
-                top: 70px;
+                display: block; /* Tampilkan navigasi desktop */
+                position: sticky; /* Sticky di desktop */
+                top: 70px; /* Di bawah header (50px) + sedikit jarak */
             }
             .site-header {
-                height: 70px;
+                height: 70px; /* Beri sedikit lebih banyak ruang untuk header di desktop */
             }
             .site-header .logo {
                 width: 60px;
@@ -464,11 +465,9 @@
     <div class="desktop-search-icon-wrapper">
         <a href="#" id="desktop-search-news-btn-icon" class="desktop-search-icon"><i class="fas fa-search"></i></a>
     </div>
-
     <main class="container">
-        <h1 id="post-title" style="font-family: var(--heading-font); font-size: 2rem; margin-bottom: 20px; text-align: center;">Memuat Konten...</h1>
-        <p id="post-meta" class="post-meta" style="text-align: center;">Oleh: -</p>
-        <div id="post-content" class="post-content">
+        <h1 id="page-title" style="font-family: var(--heading-font); font-size: 2rem; margin-bottom: 20px; text-align: center;">Memuat Halaman...</h1>
+        <div id="page-content" class="page-content">
             <p>Mohon tunggu...</p>
         </div>
     </main>
@@ -630,11 +629,11 @@
                     link.href = `index.html?kategori=${categoryData.slug}`;
                     link.id = `desktop-category-${categoryData.slug}-btn`; 
                     link.textContent = categoryData.nama; 
-                    link.classList.add('dynamic-category-link');
+                    link.classList.add('dynamic-category-link'); // Tambahkan kelas untuk identifikasi
 
                     const latestNewsBtn = document.getElementById('desktop-latest-news-btn');
                     if (latestNewsBtn) {
-                        desktopMainNav.insertBefore(link, latestNewsBtn);
+                        desktopMainNav.insertBefore(link, latestNewsBtn); // Masukkan sebelum Berita Terbaru
                     } else {
                         desktopMainNav.appendChild(link); 
                     }
@@ -646,7 +645,7 @@
                     allCategoriesLink.href = '#'; 
                     allCategoriesLink.id = 'desktop-all-categories-btn';
                     allCategoriesLink.textContent = 'Semua Kategori';
-                    allCategoriesLink.classList.add('dynamic-category-link');
+                    allCategoriesLink.classList.add('dynamic-category-link'); // Tambahkan kelas untuk identifikasi
                     allCategoriesLink.addEventListener('click', (e) => {
                         e.preventDefault();
                         loadCategoriesForPopup(); 
@@ -654,21 +653,23 @@
                     });
                     const latestNewsBtn = document.getElementById('desktop-latest-news-btn');
                     if (latestNewsBtn) {
-                        desktopMainNav.insertBefore(allCategoriesLink, latestNewsBtn);
+                        desktopMainNav.insertBefore(allCategoriesLink, latestNewsBtn); // Masukkan sebelum Berita Terbaru
                     } else {
                         desktopMainNav.appendChild(allCategoriesLink);
                     }
                 }
                 
+                // Panggil active state setelah kategori dinamis dimuat
                 activateNavButtons('desktop-');
 
             } catch (error) {
                 console.error("Gagal memuat kategori untuk navigasi desktop:", error);
+                // Tambahkan tombol default jika gagal memuat kategori
                 const fallbackCategoryLink = document.createElement('a');
                 fallbackCategoryLink.href = '#';
                 fallbackCategoryLink.id = 'desktop-fallback-category-btn';
-                fallbackCategoryLink.textContent = 'Kategori';
-                fallbackCategoryLink.classList.add('dynamic-category-link');
+                fallbackCategoryLink.textContent = 'Kategori'; // Teks default jika error
+                fallbackCategoryLink.classList.add('dynamic-category-link'); // Tambahkan kelas untuk identifikasi
                 const latestNewsBtn = document.getElementById('desktop-latest-news-btn');
                 if (latestNewsBtn) {
                     desktopMainNav.insertBefore(fallbackCategoryLink, latestNewsBtn);
@@ -678,56 +679,53 @@
             }
         }
 
-        // Fungsi khusus untuk memuat konten dari koleksi 'post' berdasarkan slug
-        async function loadPostContent() {
+        // FUNGSI KHUSUS UNTUK MEMUAT HALAMAN STATIS
+        async function loadPageContent() {
             const params = new URLSearchParams(window.location.search);
-            const postSlug = params.get('slug'); // Mengambil 'slug' untuk lihat.html
-            const postTitleElement = document.getElementById('post-title');
-            const postMetaElement = document.getElementById('post-meta');
-            const postContentElement = document.getElementById('post-content');
+            const pageId = params.get('id'); // Mengambil 'id' untuk halaman.html
+            const pageTitleElement = document.getElementById('page-title');
+            const pageContentElement = document.getElementById('page-content');
             const pageHeadTitleElement = document.getElementById('page-head-title');
 
-            if (!postSlug) {
-                postTitleElement.textContent = 'Konten Tidak Ditemukan';
-                postMetaElement.textContent = '';
-                postContentElement.innerHTML = '<p>Error: Slug konten tidak valid.</p>';
-                pageHeadTitleElement.textContent = 'Konten Tidak Ditemukan';
+
+            if (!pageId) {
+                pageTitleElement.textContent = 'Halaman Tidak Ditemukan';
+                pageContentElement.innerHTML = '<p>Error: ID halaman tidak valid.</p>';
+                pageHeadTitleElement.textContent = 'Halaman Tidak Ditemukan'; // Update head title
                 return;
             }
 
             try {
-                // Query koleksi 'post' berdasarkan 'slug'
-                const querySnapshot = await db.collection('post').where('slug', '==', postSlug).limit(1).get();
+                // Query koleksi 'halaman' berdasarkan 'id'
+                const docRef = db.collection('halaman').doc(pageId); 
+                const docSnap = await docRef.get();
 
-                if (!querySnapshot.empty) {
-                    const doc = querySnapshot.docs[0];
-                    const data = doc.data();
-                    document.title = data.judul || 'Konten Petungan';
-                    postTitleElement.textContent = data.judul || 'Konten Tanpa Judul';
-                    postMetaElement.textContent = `Oleh: ${data.editor_name || 'Petungan'} - ${data.createdAt ? data.createdAt.toDate().toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}`;
-                    postContentElement.innerHTML = data.konten || '<p>Konten tidak tersedia.</p>';
-                    pageHeadTitleElement.textContent = data.judul || 'Konten Petungan';
+                if (docSnap.exists) {
+                    const data = docSnap.data();
+                    document.title = data.judul || 'Halaman Petungan'; // Set judul tab browser
+                    pageTitleElement.textContent = data.judul || 'Halaman Tanpa Judul';
+                    pageContentElement.innerHTML = data.konten || '<p>Konten tidak tersedia.</p>'; // Menggunakan konten
+                    pageHeadTitleElement.textContent = data.judul || 'Halaman Petungan'; // Update head title
                 } else {
-                    postTitleElement.textContent = 'Konten Belum Dibuat';
-                    postMetaElement.textContent = '';
-                    postContentElement.innerHTML = '<p>Konten dengan slug ini belum tersedia.</p>';
-                    pageHeadTitleElement.textContent = 'Konten Belum Dibuat';
+                    pageTitleElement.textContent = 'Halaman Belum Dibuat';
+                    pageContentElement.innerHTML = '<p>Konten untuk halaman ini belum tersedia.</p>';
+                    pageHeadTitleElement.textContent = 'Halaman Belum Dibuat'; // Update head title
                 }
             } catch (error) {
-                console.error("Error memuat konten:", error);
-                postTitleElement.textContent = 'Gagal Memuat';
-                postMetaElement.textContent = '';
-                postContentElement.innerHTML = '<p>Terjadi kesalahan saat memuat konten.</p>';
-                pageHeadTitleElement.textContent = 'Gagal Memuat';
+                console.error("Error memuat halaman:", error);
+                pageTitleElement.textContent = 'Gagal Memuat';
+                pageContentElement.innerHTML = '<p>Terjadi kesalahan saat memuat konten.</p>';
+                pageHeadTitleElement.textContent = 'Gagal Memuat'; // Update head title
             }
         }
 
 
         // --- EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', () => {
-            loadPostContent(); // Panggil fungsi untuk memuat konten
-            loadCategoriesForDesktopNav(); // Panggil fungsi ini
-
+            loadPageContent(); // Panggil fungsi untuk memuat konten halaman
+            loadCategoriesForDesktopNav(); // Panggil fungsi ini di halaman statis juga
+            
+            // Event listener untuk tombol navigasi mobile (disalin dari index.html)
             document.getElementById('mobile-home-btn').addEventListener('click', (e) => { 
                 e.preventDefault(); 
                 window.location.href = 'index.html';
@@ -740,6 +738,7 @@
                 e.currentTarget.classList.add('active');
             });
 
+            // Tutup overlay menu kategori
             document.getElementById('more-menu-overlay').addEventListener('click', (e) => { 
                 if (e.target === document.getElementById('more-menu-overlay')) { 
                     document.getElementById('more-menu-overlay').classList.remove('visible'); 
@@ -780,11 +779,13 @@
             });
 
 
+            // Event listener untuk Navigasi Desktop (yang baru)
             document.getElementById('desktop-home-btn').addEventListener('click', (e) => {
                 e.preventDefault();
-                window.location.href = 'index.html';
+                window.location.href = 'index.html'; // Arahkan ke home
             });
 
+            // Event listener untuk tombol pencarian desktop (ikon di kanan atas)
             const desktopSearchIconBtn = document.getElementById('desktop-search-news-btn-icon'); 
             if (desktopSearchIconBtn) { 
                 desktopSearchIconBtn.addEventListener('click', (e) => {
@@ -800,12 +801,14 @@
             });
 
 
+            // Handle initial active class based on URL parameters for BOTH mobile and desktop nav
             const urlParams = new URLSearchParams(window.location.search);
             const activateNavButtons = (prefix) => {
                 document.querySelectorAll('.mobile-nav a, .desktop-nav a').forEach(link => link.classList.remove('active'));
                 const currentCategorySlug = urlParams.get('kategori');
 
                 if (urlParams.has('id') || urlParams.has('slug')) { // Untuk halaman.html atau lihat.html
+                    // Untuk halaman statis, selalu aktifkan Home di navigasi
                     if (document.getElementById(prefix + 'home-btn')) { 
                          document.getElementById(prefix + 'home-btn').classList.add('active');
                     }
@@ -814,17 +817,18 @@
                          document.getElementById(prefix + 'home-btn').classList.add('active');
                     }
                 } else if (urlParams.has('kategori')) {
+                    // Aktifkan link kategori spesifik di desktop nav
                     if (currentCategorySlug && document.getElementById(`${prefix}category-${currentCategorySlug}-btn`)) {
                         document.getElementById(`${prefix}category-${currentCategorySlug}-btn`).classList.add('active');
-                    } else if (document.getElementById(`${prefix}more-menu-btn`)) {
+                    } else if (document.getElementById(`${prefix}more-menu-btn`)) { // Jika tidak ada kategori spesifik (mobile)
                         document.getElementById(`${prefix}more-menu-btn`).classList.add('active');
-                    } else if (document.getElementById(`${prefix}all-categories-btn`)) {
+                    } else if (document.getElementById(`${prefix}all-categories-btn`)) { // Jika ada tombol "Semua Kategori" di desktop
                         document.getElementById(`${prefix}all-categories-btn`).classList.add('active');
                     }
                 } else if (urlParams.has('cari')) {
                     if (document.getElementById(prefix + 'search-news-btn')) {
                         document.getElementById(prefix + 'search-news-btn').classList.add('active');
-                    } else if (document.getElementById(`${prefix}search-news-btn-icon`)) {
+                    } else if (document.getElementById(`${prefix}search-news-btn-icon`)) { // Untuk ikon pencarian desktop
                         document.getElementById(`${prefix}search-news-btn-icon`).classList.add('active');
                     }
                 } else if (urlParams.has('terbaru')) {
@@ -833,8 +837,8 @@
                     }
                 }
             };
-            activateNavButtons('mobile-');
-            activateNavButtons('desktop-');
+            activateNavButtons('mobile-'); // Untuk mobile nav
+            activateNavButtons('desktop-'); // Untuk desktop nav
 
 
         });
