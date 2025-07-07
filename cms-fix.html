@@ -64,6 +64,33 @@
     const FieldValue = firebase.firestore.FieldValue;
     firebase.auth().onAuthStateChanged(user => { if (!user) window.location.href = 'login.html'; });
 
+    // --- Konfigurasi Multi Akun Cloudinary ---
+    const cloudinaryAccounts = [
+        { cloudName: 'dhvcpzl5w', uploadPreset: 'petungan-news' },
+        { cloudName: 'dl03akaje', uploadPreset: 'petungan-image' }, // Ganti dengan akun Cloudinary kedua Anda
+        { cloudName: 'cloudname_anda_3', uploadPreset: 'uploadpreset_anda_3' }  // Ganti dengan akun Cloudinary ketiga Anda
+    ];
+
+    let currentCloudinaryAccountIndex = 0; // Mulai dari akun pertama
+
+    // Fungsi untuk mendapatkan konfigurasi akun Cloudinary yang aktif
+    function getActiveCloudinaryAccount() {
+        return cloudinaryAccounts[currentCloudinaryAccountIndex];
+    }
+
+    // Fungsi untuk mencoba akun Cloudinary berikutnya
+    function tryNextCloudinaryAccount() {
+        currentCloudinaryAccountIndex++;
+        if (currentCloudinaryAccountIndex >= cloudinaryAccounts.length) {
+            console.error("Semua akun Cloudinary sudah dicoba atau penuh.");
+            alert("Maaf, semua akun Cloudinary saat ini penuh atau tidak dapat diakses. Silakan coba lagi nanti atau hubungi administrator.");
+            currentCloudinaryAccountIndex = 0; // Reset ke akun pertama untuk percobaan berikutnya (opsional)
+            return false;
+        }
+        console.warn(`Beralih ke akun Cloudinary berikutnya: ${cloudinaryAccounts[currentCloudinaryAccountIndex].cloudName}`);
+        return true;
+    }
+
     tinymce.init({
         selector: 'textarea#content-editor',
         plugins: 'image link lists media table wordcount preview code paste',
@@ -74,15 +101,35 @@
         automatic_uploads: true,
         file_picker_types: 'image',
         file_picker_callback: (cb, value, meta) => {
-            const myWidget = cloudinary.createUploadWidget({
-                cloudName: 'dhvcpzl5w', 
-                uploadPreset: 'petungan-news'
-            }, (error, result) => { 
-                if (!error && result && result.event === "success") { 
-                    cb(result.info.secure_url, { title: result.info.original_filename });
+            function openCloudinaryWidget() {
+                const activeAccount = getActiveCloudinaryAccount();
+                if (!activeAccount) {
+                    alert("Tidak ada akun Cloudinary yang tersedia.");
+                    return;
                 }
-            });
-            myWidget.open();
+
+                const myWidget = cloudinary.createUploadWidget({
+                    cloudName: activeAccount.cloudName, 
+                    uploadPreset: activeAccount.uploadPreset
+                }, (error, result) => { 
+                    if (error) {
+                        console.error("Cloudinary upload error:", error);
+                        // Jika ada error, coba akun berikutnya
+                        if (tryNextCloudinaryAccount()) {
+                            alert("Terjadi masalah dengan akun Cloudinary saat ini. Mencoba akun berikutnya...");
+                            openCloudinaryWidget(); // Coba lagi dengan akun berikutnya
+                        } else {
+                            alert("Gagal mengunggah gambar setelah mencoba semua akun Cloudinary. Silakan coba lagi nanti.");
+                        }
+                    } else if (result && result.event === "success") { 
+                        cb(result.info.secure_url, { title: result.info.original_filename });
+                        // Reset ke akun pertama setelah berhasil upload untuk distribusi yang lebih baik
+                        currentCloudinaryAccountIndex = 0; 
+                    }
+                });
+                myWidget.open();
+            }
+            openCloudinaryWidget(); // Panggil fungsi pertama kali
         }
     });
 
@@ -146,13 +193,13 @@
                 await loadHierarchicalCategories(data ? data.category : null);
             } else {
                 tinymce.on('init', () => {
-                     const editor = tinymce.get('content-editor');
-                     if(data) {
-                         editor.setContent(data.content || '');
-                         // Muat keywords ke input manual
-                         document.getElementById('keywords-input').value = (data.keywords && Array.isArray(data.keywords)) ? data.keywords.join(', ') : '';
-                     }
-                     loadHierarchicalCategories(data ? data.category : null);
+                    const editor = tinymce.get('content-editor');
+                    if(data) {
+                        editor.setContent(data.content || '');
+                        // Muat keywords ke input manual
+                        document.getElementById('keywords-input').value = (data.keywords && Array.isArray(data.keywords)) ? data.keywords.join(', ') : '';
+                    }
+                    loadHierarchicalCategories(data ? data.category : null);
                 });
             }
         };
@@ -176,7 +223,7 @@
                 await loadHierarchicalCategories();
             }
         } else {
-             await loadHierarchicalCategories();
+            await loadHierarchicalCategories();
         }
     });
 
