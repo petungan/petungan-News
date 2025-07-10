@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>Memuat Berita...</title>
+    <title id="detail-page-title">Memuat Berita...</title>
+    
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5922983068453797"
+        crossorigin="anonymous"></script>
+    
     <meta name="description" content="Sebuah artikel dari situs Petungan.">
     <meta property="og:type" content="article">
     <meta property="og:site_name" content="Petungan">
@@ -18,15 +22,14 @@
     <meta name="twitter:image" content="https://petungan.github.io/petungan-News/logo.png">
     
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script> 
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     <script>
-        // Konfigurasi Firebase Anda (pastikan ini sama di semua file)
+        // Konfigurasi Firebase Anda
         const firebaseConfig = {
-            apiKey: "AIzaSyCNnM11tIUEl4eu5AYTObXdlDI47EZts-A",
+            apiKey: "AIzaSyCNnM11tIUEl4eu5AYTObXdlDI47EZts-A", // Ganti dengan API Key Anda
             authDomain: "petugan-jawa-news.firebaseapp.com",
             projectId: "petugan-jawa-news",
-            storageBucket: "petugan-jawa-news.firebasestorage.app",
+            storageBucket: "petugan-jawa-news.appspot.com",
             messagingSenderId: "928855786984",
             appId: "1:928855786984:web:9d7f0b7a7022943895d05d",
             measurementId: "G-DV19ZVP0KE"
@@ -37,14 +40,16 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Cabin:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
     <meta name="theme-color" content="#2c3e50"/>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="logo.png">
+    <link rel="icon" href="favicon.png">
 
     <style>
+        /* Variabel CSS untuk tema */
         :root {
             --primary-font: 'Roboto', sans-serif;
             --heading-font: 'Merriweather', serif;
@@ -57,6 +62,7 @@
             --dark-grey: #777;
         }
 
+        /* Reset dan Box Sizing */
         html {
             height: 100%; 
             margin: 0;
@@ -77,9 +83,9 @@
         }
 
         .container {
-            max-width: 800px; /* Lebih kecil untuk detail artikel */
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 15px;
         }
 
         a {
@@ -104,8 +110,8 @@
         }
 
         .site-header .logo {
-            width: 40px; /* Lebih kecil di detail */
-            height: 40px;
+            width: 50px;
+            height: 50px;
             margin-right: 12px;
         }
 
@@ -116,56 +122,130 @@
             margin: 0;
         }
 
-        /* Gaya Artikel */
-        .article-header {
-            border-bottom: 1px solid #eee;
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-        }
-        .article-title {
-            font-family: var(--heading-font);
-            font-size: 2rem;
-            margin: 0 0 10px 0;
-            line-height: 1.3;
-        }
-        .article-meta {
-            font-size: .9rem;
-            color: #777;
-        }
-        .article-meta .category {
-            font-weight: 700;
-            color: var(--accent-color);
-            text-transform: capitalize;
-        }
-        .main-image {
-            width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            background-color: #eee;
-        }
-        .article-content {
-            font-family: var(--primary-font); /* Gunakan primary-font */
-            line-height: 1.8;
-            font-size: 1.1rem;
-            color: var(--text-color); /* Gunakan text-color */
-        }
-        .article-content img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-        }
-        .article-content h1, .article-content h2, .article-content h3 {
-            font-family: var(--heading-font);
+        /* Kontainer Berita Utama */
+        .news-feed {
+            display: flex;
+            flex-direction: column; 
+            gap: 20px;
+            min-height: 300px;
         }
 
-        .loading {
-            text-align: center;
-            padding: 50px;
-            font-size: 1.2rem;
+        /* Gaya Kartu Berita Dasar */
+        .news-item-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .news-item-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .news-item-card .news-image {
+            width: 100%;
+            height: auto; 
+            object-fit: cover;
+            background-color: var(--light-grey);
+            display: block;
+        }
+
+        .news-item-card .news-content {
+            padding: 15px;
+        }
+
+        .news-item-card .news-title {
+            font-family: var(--heading-font);
+            line-height: 1.4;
+            margin: 8px 0;
+            color: var(--text-color);
         }
         
-        /* Navigasi Mobile (Fixed di bawah) */
+        .news-item-card .news-meta {
+            font-size: 0.8em;
+            color: var(--dark-grey);
+            margin-top: 8px;
+            margin-bottom: 0;
+        }
+
+        /* ============================================== */
+        /* Gaya Spesifik untuk Berbagai Tata Letak Berita */
+        /* ============================================== */
+
+        /* HERO LIST ITEM (Artikel pertama dengan ukuran besar) */
+        .hero-list-item {
+            display: flex;
+            flex-direction: column; 
+            gap: 15px;
+            padding: 0; 
+        }
+        .hero-list-item .news-image {
+            height: 250px; 
+        }
+        .hero-list-item .news-content {
+            padding: 15px; 
+        }
+        .hero-list-item .news-title {
+            font-size: 1.6rem;
+        }
+        .hero-list-item .news-excerpt {
+            font-size: 1em;
+            color: var(--text-color);
+            line-height: 1.6;
+            margin-top: 5px;
+        }
+
+        /* NEWS LIST ITEM (2 kolom untuk item daftar yang lebih kecil) */
+        .news-list-item-wrapper { 
+            display: grid;
+            grid-template-columns: 1fr; 
+            gap: 20px;
+        }
+        .news-list-item {
+            display: flex;
+            align-items: flex-start; 
+            gap: 15px;
+            padding: 0; 
+        }
+        .news-list-item .news-image {
+            width: 120px; 
+            height: 120px; 
+            flex-shrink: 0; 
+            border-radius: 4px;
+        }
+        .news-list-item .news-content {
+            padding: 15px; 
+            flex-grow: 1;
+        }
+        .news-list-item .news-title {
+            font-size: 1.1rem;
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+
+        /* NEWS GRID (3 kolom untuk sebagian besar artikel) */
+        .news-grid-container {
+            display: grid;
+            grid-template-columns: 1fr; 
+            gap: 20px;
+        }
+        .news-grid .news-image {
+            aspect-ratio: 16 / 9; 
+            height: auto; 
+            border-radius: 8px 8px 0 0; 
+        }
+        .news-grid .news-title {
+            font-size: 1rem;
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+
+
+        /* ============================================== */
+        /* Pembungkus untuk Navigasi Mobile (Fixed di bagian bawah) */
+        /* ============================================== */
         #nav-wrapper {
             position: fixed; 
             bottom: 0; 
@@ -173,7 +253,7 @@
             right: 0;
             height: 65px;
             background-color: var(--header-bg); 
-            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             z-index: 1001; 
             display: flex; 
             justify-content: space-around;
@@ -202,61 +282,79 @@
             font-size: .75rem;
             gap: 4px;
             height: 100%;
-            text-decoration: none; /* Tambahkan ini jika belum ada */
-        }
-
-        .mobile-nav a i {
-            font-size: 1.4rem; /* Sesuaikan ukuran ikon */
-            margin-bottom: 2px;
         }
 
         .mobile-nav a.active {
             color: var(--accent-color); 
         }
 
-        /* Share Buttons */
-        .share-buttons { 
-            margin-top: 15px; 
-            margin-bottom: 15px; 
-            display: flex; 
-            gap: 15px; 
-            justify-content: center; 
-        } 
-        .share-buttons a { 
-            font-size: 1.8rem; 
-            color: #555; 
+        /* Navigasi Desktop */
+        .desktop-nav-wrapper {
+            display: none; /* Sembunyikan secara default di mobile */
+            background-color: var(--header-bg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 20px; /* Jarak antara nav dan konten */
+            padding: 0 15px; /* Padding horizontal */
+            position: sticky; /* Sticky di desktop */
+            top: 70px; /* Di bawah header (50px) + sedikit jarak */
+            z-index: 999; /* Di bawah header, di atas konten */
+            border-radius: 8px; /* Border radius */
         }
 
-        /* Footer (Statis, tidak fixed) */
-        .site-footer { 
-            background-color: #2c3e50; 
-            color: #ecf0f1; 
-            text-align: center; 
-            padding: 20px; 
-            margin-top: 40px; 
-            font-size: 0.9em; 
-            position: static; /* Pastikan tidak fixed */
-            box-shadow: none; /* Hapus bayangan jika ada */
-            padding-bottom: 20px; 
-        }
-        .footer-links { 
-            margin-bottom: 15px; 
-            display: flex; /* Untuk layout responsif */
-            flex-wrap: wrap; /* Untuk wrap link di mobile */
-            justify-content: center; /* Pusatkan link */
-            gap: 10px; /* Jarak antar link */
-        } 
-        .footer-links a { 
-            color: #fff; 
-            text-decoration: underline; 
-            margin: 0 5px; /* Sesuaikan margin */
-        }
-        .copyright { 
-            margin: 0; 
-            color: #bdc3c7; 
+        .desktop-nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: flex-start; /* Pindah ke kiri */
+            align-items: center;
+            height: 50px; /* Tinggi navigasi desktop */
+            gap: 25px; /* Meningkatkan jarak antar item nav untuk tampilan yang lebih bersih */
         }
 
-        /* Overlay Menu Kategori (disalin dari index.html) */
+        .desktop-nav a {
+            display: flex;
+            align-items: center;
+            padding: 10px 0; /* Mengurangi padding horizontal karena gap sudah diatur */
+            color: #555;
+            font-size: 0.95rem;
+            font-weight: 500;
+            gap: 8px;
+            transition: color 0.2s ease, background-color 0.2s ease;
+            border-radius: 4px;
+            white-space: nowrap; /* Pastikan teks tidak pecah baris */
+        }
+
+        .desktop-nav a:hover {
+            color: var(--accent-color);
+            background-color: transparent; /* Hapus background-color saat hover untuk tampilan yang lebih bersih */
+        }
+
+        .desktop-nav a.active {
+            color: var(--accent-color);
+        }
+
+        /* Search Icon di Desktop Nav (pindah ke kanan atas) */
+        .desktop-search-icon-wrapper {
+            display: none; /* Sembunyikan secara default */
+            position: absolute; /* Posisi absolut */
+            right: 30px; /* Dari kanan halaman */
+            top: 80px; /* Di bawah header */
+            z-index: 1000;
+        }
+
+        .desktop-search-icon {
+            color: #555;
+            font-size: 1.5rem; /* Ukuran ikon */
+            cursor: pointer;
+            padding: 5px; /* Area klik */
+        }
+        .desktop-search-icon:hover {
+            color: var(--accent-color);
+        }
+        /* Akhir Navigasi Desktop */
+
+
+        /* Overlay Menu Kategori */
         .more-menu-overlay {
             position: fixed;
             top: 0;
@@ -265,7 +363,7 @@
             height: 100%;
             background: rgba(0,0,0,0.5);
             z-index: 1002;
-            display: none; /* Default hidden */
+            display: none;
             align-items: flex-end;
             justify-content: center; 
         }
@@ -297,45 +395,8 @@
             margin-bottom: 20px;
             font-family: var(--heading-font);
         }
-        
-        /* Gaya Grid Kategori dalam Overlay (disalin dari index.html) */
-        #category-grid { 
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* 2 kolom untuk mobile */
-            gap: 15px;
-            padding: 10px;
-        }
 
-        .category-card {
-            background-color: var(--card-bg);
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            overflow: hidden;
-            text-align: center;
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-
-        .category-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .category-card img {
-            width: 100%;
-            height: 100px; 
-            object-fit: cover;
-            border-bottom: 1px solid var(--light-grey);
-        }
-
-        .category-card span {
-            display: block;
-            padding: 10px;
-            font-family: var(--heading-font);
-            font-weight: 700;
-            color: var(--text-color);
-        }
-
-        /* Overlay Pencarian (disalin dari index.html) */
+        /* Overlay Pencarian */
         .search-overlay {
             position: fixed;
             top: 0;
@@ -344,7 +405,7 @@
             height: 100%;
             background: rgba(0,0,0,0.5);
             z-index: 1002;
-            display: none; /* Default hidden */
+            display: none; 
             align-items: flex-end;
             justify-content: center; 
         }
@@ -405,79 +466,467 @@
             margin-top: 20px;
         }
 
-        /* Media Queries (disalin dari index.html) */
+        /* Kontrol Paginasi */
+        .pagination-controls {
+            display: flex;
+            justify-content: center; 
+            align-items: center;
+            margin-top: 30px;
+            gap: 15px;
+            padding-bottom: 20px; 
+        }
+
+        .pagination-button {
+            padding: 10px 20px;
+            border: 1px solid var(--accent-color);
+            background-color: #fff;
+            color: var(--accent-color);
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .pagination-button:hover:not(:disabled) {
+            background-color: var(--accent-color);
+            color: #fff;
+        }
+
+        .pagination-button:disabled {
+            border-color: #ccc;
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Footer (Statis, tidak fixed) */
+        .site-footer {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            font-size: 0.9em;
+            position: static; 
+            box-shadow: none; 
+            padding-bottom: 20px; 
+        }
+
+        .footer-links {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 15px; 
+            flex-wrap: wrap; 
+            justify-content: center;
+        }
+
+        .footer-links a {
+            color: #fff;
+            text-decoration: underline; 
+            margin: 0 10px; 
+            padding: 0; 
+            border-radius: 0; 
+            transition: none; 
+        }
+
+        .footer-links a:hover {
+            background-color: transparent; 
+            color: #ccc; 
+        }
+
+        .copyright {
+            margin: 0;
+            color: #bdc3c7;
+        }
+
+        /* Gaya Grid Kategori dalam Overlay */
+        #category-grid { 
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 2 kolom untuk mobile */
+            gap: 15px;
+            padding: 10px;
+        }
+
+        .category-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            overflow: hidden;
+            text-align: center;
+            transition: transform 0.2s ease-in-out, box-shadow 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .category-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .category-card img {
+            width: 100%;
+            height: 100px; 
+            object-fit: cover;
+            border-bottom: 1px solid var(--light-grey);
+        }
+
+        .category-card span {
+            display: block;
+            padding: 10px;
+            font-family: var(--heading-font);
+            font-weight: 700;
+            color: var(--text-color);
+        }
+        
+        /* ============================================== */
+        /* Gaya Spesifik untuk Halaman Detail Berita */
+        /* ============================================== */
+        .article-container {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 20px;
+            margin-top: 20px;
+            position: relative; /* Penting untuk penempatan pop-up absolut */
+            overflow: visible; /* Pastikan pop-up tidak terpotong jika keluar dari batas */
+        }
+
+        .article-title {
+            font-family: var(--heading-font);
+            font-size: 2.2rem;
+            line-height: 1.2;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+
+        .article-meta {
+            font-size: 0.9em;
+            color: var(--dark-grey);
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--light-grey);
+            padding-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+
+        .article-image {
+            width: 100%;
+            height: auto;
+            max-height: 450px; 
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .article-content {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: var(--text-color);
+        }
+
+        .article-content p {
+            margin-bottom: 1em;
+        }
+
+        .article-content img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .article-content h1, .article-content h2, .article-content h3, .article-content h4, .article-content h5, .article-content h6 {
+            font-family: var(--heading-font);
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            color: var(--text-color);
+        }
+
+        .article-content ul, .article-content ol {
+            margin-left: 20px;
+            margin-bottom: 1em;
+        }
+
+        .article-content li {
+            margin-bottom: 0.5em;
+        }
+
+        /* Tombol Share Sosial Media dan Text-to-Speech */
+        .meta-right-icons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px; /* Add some space if it wraps */
+            justify-content: flex-end; /* Align to the right */
+            flex-grow: 1; /* Allow it to take available space */
+            flex-wrap: wrap; /* Allow wrapping */
+        }
+
+        .social-share, .text-to-speech-wrapper { /* Group social share and TTS together */
+            display: flex;
+            gap: 10px; /* Space between social icons and TTS */
+            align-items: center;
+        }
+
+        .social-share a, .text-to-speech-button { /* Changed text-to-speech-share to text-to-speech-button */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            transition: transform 0.2s ease;
+        }
+
+        .social-share a:hover, .text-to-speech-button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Specific colors for social media icons */
+        .facebook-share {
+            background-color: #3b5998;
+        }
+
+        .twitter-share {
+            background-color: #1da1f2;
+        }
+
+        .whatsapp-share {
+            background-color: #25d366;
+        }
+
+        .telegram-share {
+            background-color: #0088cc;
+        }
+
+        /* Color for Text-to-Speech button */
+        .text-to-speech-button {
+            background-color: var(--accent-color); /* Use accent color for TTS button */
+        }
+
+        /* Gaya untuk pesan sementara (pop-up yang lebih umum, jarang dipakai di halaman detail) */
+        .temp-message {
+            position: fixed;
+            bottom: 80px; /* Di atas navigasi mobile */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 1003;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            pointer-events: none; /* Agar tidak menghalangi klik */
+            white-space: nowrap;
+        }
+        .temp-message.show {
+            opacity: 1;
+        }
+
+        /* Gaya untuk pop-up khusus di bawah judul berita */
+        .custom-popup-message {
+            position: absolute; /* Diposisikan relatif terhadap elemen induk (.article-container) */
+            background-color: white;
+            color: black;
+            font-size: 20px; /* Ukuran font lebih besar */
+            padding: 15px 20px; /* Padding lebih besar */
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+            z-index: 1005; /* Lebih tinggi dari elemen lain */
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out; /* Transisi lebih halus */
+            text-align: center;
+            left: 50%; /* Posisikan di tengah secara horizontal */
+            transform: translateX(-50%); /* Koreksi posisi agar benar-benar di tengah */
+            
+            /* --- Perubahan untuk rasio horizontal 16:9 --- */
+            width: 80vw; /* Atur lebar relatif terhadap viewport width */
+            max-width: 600px; /* Batasi lebar maksimum */
+            aspect-ratio: 16 / 9; /* Ini akan memaksa rasio 16:9 */
+            min-height: unset; /* Hapus min-height sebelumnya agar aspect-ratio mendominasi */
+            
+            display: flex; /* Untuk menata teks di dalamnya */
+            flex-direction: column; /* Teks akan berada di baris baru */
+            justify-content: center; /* Pusatkan teks secara vertikal */
+            align-items: center; /* Pusatkan teks secara horizontal */
+            line-height: 1.4; /* Jarak antar baris default */
+        }
+
+        .custom-popup-message span {
+            display: block; /* Pastikan setiap baris teks memiliki blok sendiri */
+            margin-bottom: 10px; /* **Ini yang memberi jarak antar baris!** */
+            /* Anda bisa mengatur nilai ini (misalnya 5px, 10px, 15px) sesuai keinginan */
+        }
+        .custom-popup-message span:last-child {
+            margin-bottom: 0; /* Hapus margin-bottom untuk elemen span terakhir */
+        }
+
+        .custom-popup-message.show {
+            opacity: 1;
+        }
+
+
+        /* Gaya untuk overlay loading TTS */
+        .tts-loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1004;
+            color: white;
+            font-size: 1.2em;
+            display: none; /* Hidden by default */
+        }
+
+        .tts-loading-overlay.show {
+            display: flex;
+        }
+
+        .tts-loading-overlay .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #fff;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Gaya untuk highlight TTS */
+        .tts-highlight {
+            background-color: #ffff99; /* Warna kuning muda */
+            transition: background-color 0.3s ease;
+            padding: 2px 5px; /* Sedikit padding agar tidak terlalu mepet */
+            border-radius: 3px;
+        }
+
+
+        /* Media Queries untuk Responsif */
         @media (min-width: 600px) {
+            .news-list-item-wrapper {
+                grid-template-columns: 1fr 1fr; 
+            }
+            .news-grid-container {
+                grid-template-columns: 1fr 1fr; 
+            }
+            .news-list-item .news-image {
+                width: 100px; 
+                height: 100px;
+            }
             #category-grid {
                 grid-template-columns: 1fr 1fr 1fr; /* 3 kolom untuk tablet */
+            }
+            .related-news-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .custom-popup-message {
+                /* Sesuaikan lebar untuk layar yang lebih besar jika perlu, 
+                   tapi aspect-ratio akan tetap menjaga proporsi */
+                width: 60vw; 
             }
         }
 
         @media (min-width: 768px) {
+            .hero-list-item {
+                flex-direction: row; 
+                align-items: flex-start;
+                padding: 15px; 
+            }
+            .hero-list-item .news-image {
+                width: 400px; 
+                height: 280px;
+                margin-right: 20px;
+                border-radius: 8px;
+            }
+            .hero-list-item .news-content {
+                padding: 0; 
+            }
+            .hero-list-item .news-title {
+                font-size: 2.2rem;
+            }
+            .news-list-item .news-image {
+                width: 120px; 
+                height: 120px;
+            }
             #category-grid {
                 grid-template-columns: 1fr 1fr 1fr 1fr; /* 4 kolom untuk desktop kecil */
             }
-        }
 
-        /* Gaya untuk Artikel Terkait */
-        .related-articles {
-            margin-top: 40px;
-            /* border-top: 1px solid #eee; */ /* Hapus atau sesuaikan jika Anda ingin garis yang lebih kental */
-            padding-top: 20px; /* Tambah padding agar ada jarak dari garis atas */
-        }
-        .related-articles h2 {
-            font-family: var(--heading-font);
-            font-size: 1.3rem; /* Font diperkecil */
-            text-align: left; /* Posisi di sebelah kiri */
-            margin-bottom: 15px; /* Kurangi margin bawah */
-            color: var(--primary-color);
-            padding-left: 5px; /* Sedikit padding agar tidak menempel pinggir */
-            border-bottom: 2px solid var(--accent-color); /* Garis tebal di bawah judul */
-            padding-bottom: 8px; /* Jarak antara judul dan garis */
-            display: inline-block; /* Agar border hanya sepanjang teks */
-            margin-right: auto; /* Untuk meratakan ke kiri di container flex/grid jika ada */
-        }
-        .related-articles-grid {
-            display: grid;
-            grid-template-columns: 1fr; /* Default 1 kolom untuk mobile */
-            gap: 20px;
-        }
-        @media (min-width: 600px) {
-            .related-articles-grid {
-                grid-template-columns: 1fr 1fr; /* 2 kolom untuk tablet */
+            /* Desktop Specific Adjustments */
+            body {
+                padding-top: 120px; /* Header (70px) + Desktop Nav (50px) */
+                padding-bottom: 40px; /* Footer tidak fixed di desktop, kurangi padding */
+            }
+            #nav-wrapper {
+                display: none; /* Sembunyikan navigasi mobile di desktop */
+            }
+            .desktop-nav-wrapper {
+                display: block; /* Tampilkan navigasi desktop */
+                position: sticky; /* Sticky di desktop */
+                top: 70px; /* Di bawah header (50px) + sedikit jarak */
+                /* Z-index 999, border-radius 8px, box-shadow sudah ada */
+            }
+            .site-header {
+                height: 70px; /* Beri sedikit lebih banyak ruang untuk header di desktop */
+            }
+            .site-header .logo {
+                width: 60px; /* Ukuran logo di desktop */
+                height: 60px;
+            }
+            .site-header .site-title {
+                font-size: 1.8rem; /* Ukuran judul di desktop */
+            }
+            /* Search Icon di Desktop Nav (pindah ke kanan atas) */
+            .desktop-search-icon-wrapper {
+                display: block; /* Tampilkan di desktop */
+                position: absolute; /* Posisi absolut */
+                right: 30px; /* Dari kanan halaman */
+                top: 80px; /* Di bawah header */
+                z-index: 1000;
+            }
+            .article-title {
+                font-size: 2.8rem;
+            }
+            .article-content {
+                font-size: 1.15em;
+            }
+
+            /* Adjust temp message position for desktop */
+            .temp-message {
+                bottom: 20px; /* Di atas footer */
+            }
+            .custom-popup-message {
+                width: 50vw; /* Lebih lebar di desktop */
             }
         }
-        .related-article-card {
-            background-color: var(--card-bg);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            display: block; /* Agar link berfungsi sebagai blok */
-        }
-        .related-article-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .related-article-card img {
-            width: 100%;
-            height: 150px; /* Tinggi gambar artikel terkait */
-            object-fit: cover;
-            background-color: var(--light-grey);
-            display: block;
-        }
-        .related-article-card .content {
-            padding: 15px;
-        }
-        .related-article-card .title {
-            font-family: var(--heading-font);
-            font-size: 1.1rem;
-            margin: 0 0 8px 0;
-            line-height: 1.4;
-            color: var(--text-color);
-        }
-        .related-article-card .meta {
-            font-size: 0.8em;
-            color: var(--dark-grey);
+
+        @media (min-width: 992px) {
+            .news-grid-container {
+                grid-template-columns: 1fr 1fr 1fr; 
+            }
+            .news-grid .news-title {
+                font-size: 1.1rem; 
+            }
+            .related-news-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+            .custom-popup-message {
+                width: 40vw; /* Lebih lebar lagi di layar yang lebih besar */
+            }
         }
     </style>
 </head>
@@ -487,33 +936,27 @@
             <img src="logo.png" alt="Logo Petungan" class="logo">
         </a>
         <a href="index.html">
-            <h1 class="site-title">Petungan</h1>
+            <h1 id="site-title" class="site-title">Petungan</h1>
         </a>
     </header>
-    
-    <main class="container">
-        <div id="article-container" style="display:none;">
-            <header class="article-header">
-                <p class="article-meta"><span class="category" id="detail-category"></span> - <span id="detail-timestamp"></span></p>
-                <h1 class="article-title" id="detail-title"></h1>
-                <div class="share-buttons">
-                    <a href="#" id="share-facebook" aria-label="Bagikan ke Facebook" target="_blank"><i class="fab fa-facebook"></i></a>
-                    <a href="#" id="share-twitter" aria-label="Bagikan ke X (Twitter)" target="_blank"><i class="fab fa-x-twitter"></i></a>
-                    <a href="#" id="share-whatsapp" aria-label="Bagikan ke WhatsApp" target="_blank"><i class="fab fa-whatsapp"></i></a>
-                    <a href="#" id="share-generic" aria-label="Bagikan"><i class="fas fa-share-alt"></i></a>
-                </div>
-                <p class="article-meta">Oleh: <strong id="detail-editor"></strong></p>
-            </header>
-            <div id="article-content" class="article-content"></div>
 
-            <div class="related-articles" id="related-articles-section">
-                <h2>Artikel Terkait</h2>
-                <div class="related-articles-grid" id="related-articles-grid">
-                    </div>
-                <p id="no-related-articles" style="text-align: center; display: none; color: var(--dark-grey);">Tidak ada artikel terkait lainnya dalam kategori ini.</p>
-            </div>
-            </div>
-        <div id="loading-container" class="loading"><p>Memuat berita...</p></div>
+    <div class="desktop-nav-wrapper">
+        <nav class="desktop-nav" id="desktop-main-nav">
+            </nav>
+    </div>
+    <div class="desktop-search-icon-wrapper">
+        <a href="#" id="desktop-search-news-btn-icon" class="desktop-search-icon"><i class="fas fa-search"></i></a>
+    </div>
+    <main class="container">
+        <div class="article-container" id="article-detail-container">
+            <p>Memuat detail berita...</p>
+        </div>
+
+        <div class="related-news-section" id="related-news-section" style="display: none;">
+            <h2>Berita Terkait</h2>
+            <div class="related-news-grid" id="related-news-grid">
+                </div>
+        </div>
     </main>
 
     <div class="more-menu-overlay" id="more-menu-overlay">
@@ -533,13 +976,13 @@
             <div id="search-results" class="search-results"></div>
         </div>
     </div>
-
+    
     <div id="nav-wrapper">
         <nav class="mobile-nav">
-            <a href="index.html" class="active"><i class="fas fa-home"></i><span>Home</span></a>  
-            <a href="#" id="more-menu-btn"><i class="fas fa-th-large"></i><span>Kategori</span></a>
-            <a href="#" id="search-news-btn"><i class="fas fa-search"></i><span>Cari Berita</span></a>
-            <a href="#" id="latest-news-btn"><i class="fas fa-fire"></i><span>Berita Terbaru</span></a>
+            <a href="index.html" id="mobile-home-btn"><i class="fas fa-home"></i><span>Home</span></a>  
+            <a href="#" id="mobile-more-menu-btn"><i class="fas fa-th-large"></i><span>Kategori</span></a>
+            <a href="#" id="mobile-search-news-btn"><i class="fas fa-search"></i><span>Cari Berita</span></a>
+            <a href="#" id="mobile-latest-news-btn"><i class="fas fa-fire"></i><span>Berita Terbaru</span></a>
         </nav>
     </div>
     
@@ -551,36 +994,561 @@
         </div>
         <p class="copyright">&copy; 2025 Petungan. Semua Hak Cipta Dilindungi.</p>
     </footer>
-    
-    <script>
-        // Konstan dan Inisialisasi yang sama dengan index.html jika diperlukan oleh fungsi baru
-        // const NEWS_PER_PAGE = 30; // Tidak terpakai langsung di detail, tapi baik untuk konsistensi
-        // const db = firebase.firestore(); // Dinyatakan di awal, tidak perlu ulang di sini
 
-        function getFirstImageFromContent(htmlContent) { if (!htmlContent) return null; const match = htmlContent.match(/<img[^>]+src="([^">]+)"/); return match ? match[1] : null; }
+    <div id="temp-message" class="temp-message"></div>
+    <div id="tts-loading-overlay" class="tts-loading-overlay">
+        <div class="spinner"></div>
+        <span>Memuat suara...</span>
+    </div>
+
+    <script>
+        // --- GLOBAL SPEECH SYNTHESIS VARIABLES ---
+        const synth = window.speechSynthesis;
+        let currentUtterance = null;
+        let isSpeaking = false;
+        let voices = []; // To store available voices
+        let ttsReady = false; // Flag to indicate if TTS voices are loaded and ready
+        let currentChunkIndex = 0; // For chunking
+        let articleChunks = []; // To store text chunks
+        let isPausedBySystem = false; // Flag to track if system paused TTS
+        let highlightedElement = null; // To keep track of the currently highlighted element
+
+        // Function to display temporary messages to the user (still useful for other messages)
+        function showTemporaryMessage(message, duration = 3000) {
+            const messageElement = document.getElementById('temp-message');
+            if (messageElement) {
+                messageElement.textContent = message;
+                messageElement.classList.add('show');
+                setTimeout(() => {
+                    messageElement.classList.remove('show');
+                }, duration);
+            }
+        }
+
+        // Function to show/hide TTS loading overlay
+        function showTtsLoading(show) {
+            const loadingOverlay = document.getElementById('tts-loading-overlay');
+            if (loadingOverlay) {
+                if (show) {
+                    loadingOverlay.classList.add('show');
+                } else {
+                    loadingOverlay.classList.remove('show');
+                }
+            }
+        }
+
+        // Function to populate voices array once they are loaded
+        function populateVoiceList() {
+            voices = synth.getVoices();
+            if (voices.length > 0) {
+                ttsReady = true;
+                console.log("TTS voices loaded and ready.");
+                showTtsLoading(false); // Hide loading overlay once voices are ready
+            } else {
+                ttsReady = false;
+                console.warn("No TTS voices available yet.");
+            }
+        }
+
+        // Listen for voices to be loaded (important for cross-browser compatibility)
+        if (synth) { // Check if speechSynthesis is supported
+            synth.onvoiceschanged = populateVoiceList;
+            // Also try to populate immediately in case onvoiceschanged already fired or won't fire
+            populateVoiceList();
+        } else {
+            console.error("Web Speech API (SpeechSynthesis) not supported in this browser.");
+            showTemporaryMessage("Fitur Text-to-Speech tidak didukung di browser ini.", 5000);
+        }
+
+        // --- FUNGSI UTILITY ---
+        function getFirstImageFromContent(htmlContent) {
+            if (!htmlContent) return null;
+            const match = htmlContent.match(/<img[^>]+src="([^">]+)"/);
+            return match ? match[1] : null;
+        }
+        // Hilangkan tag <img> pertama dari konten
+        function removeFirstImageTag(htmlContent) {
+            if (!htmlContent) return htmlContent;
+            // Hapus hanya IMG pertama
+            return htmlContent.replace(/<img[^>]*?>/, '');
+        }
         
+        // Function to strip HTML tags and attempt to handle common acronyms
+        function stripHtmlAndProcessAcronyms(html) {
+            let doc = new DOMParser().parseFromString(html, 'text/html');
+            let text = doc.body.textContent || "";
+
+            // Simple heuristic for common acronyms: convert all-caps words to title case.
+            // This is a best-effort approach and might not be perfect for all cases.
+            // It targets words that are 2 or more uppercase letters.
+            text = text.replace(/\b([A-Z]{2,})\b/g, (match) => {
+                // Specific common acronyms that should be read as words
+                const commonAcronymsToReadAsWords = ['NASA', 'WHO', 'NATO', 'UNICEF', 'ASEAN', 'PBB', 'KPK', 'DPR', 'MPR', 'RI'];
+                if (commonAcronymsToReadAsWords.includes(match.toUpperCase())) { // Use toUpperCase for comparison
+                    return match; // Keep as is, hoping the engine pronounces it as a word
+                }
+                // For other all-caps, convert to title case to encourage reading as a word
+                // e.g., "TEXT" -> "Text", "API" -> "Api"
+                return match.charAt(0).toUpperCase() + match.slice(1).toLowerCase();
+            });
+
+            return text;
+        }
+
         function formatCategoryName(slug) {
             if (!slug || slug === 'undefined') return 'Umum';
             return slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
         }
-        
-        function initSocialShare(title) {
-            const currentUrl = window.location.href;
-            const encodedUrl = encodeURIComponent(currentUrl);
-            const shareText = encodeURIComponent(`Baca berita ini: ${title}`);
-            document.getElementById('share-facebook').href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
-            document.getElementById('share-twitter').href = `https://twitter.com/intent/tweet?text=${shareText}&url=${encodedUrl}`;
-            document.getElementById('share-whatsapp').href = `https://api.whatsapp.com/send?text=${shareText} ${encodedUrl}`;
-            document.getElementById('share-generic').addEventListener('click', async (e) => {
-                e.preventDefault();
-                if (navigator.share) {
-                    try { await navigator.share({ title: title, text: `Baca berita: ${title}`, url: currentUrl }); }
-                    catch (err) { console.error('Gagal berbagi:', err); }
-                } else { alert('Fitur berbagi tidak didukung di browser ini.'); }
-            });
+
+        // --- FUNGSI PEMBUAT ELEMEN BERITA (untuk berita terkait) ---
+        function createGridItem(news) {
+            const newsUrl = `detail.html?id=${news.id}`;
+            const imageUrl = getFirstImageFromContent(news.content) || `https://picsum.photos/400/225?random=${news.id}`; 
+            const element = document.createElement('a');
+            element.href = newsUrl;
+            element.className = 'news-item-card news-grid';
+
+            element.innerHTML = `
+                <img src="${imageUrl}" alt="${news.title || 'Gambar Berita'}" class="news-image">
+                <div class="news-content">
+                    <h4 class="news-title">${news.title || 'Judul Berita'}</h4>
+                    <p class="news-meta">Oleh: ${news.editor_name || 'Petungan'} - ${news.createdAt ? news.createdAt.toDate().toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}</p>
+                </div>
+            `;
+            return element;
         }
 
-        // Fungsi untuk memuat kategori (disalin dari index.html, sesuaikan jika ada perubahan di sana)
+        // --- FUNGSI UNTUK MEMBUAT TOMBOL SHARE + TTS ---
+        function createShareAndTtsButtons(title, url) {
+            const encodedTitle = encodeURIComponent(title);
+            const encodedUrl = encodeURIComponent(url);
+            
+            return `
+                <div class="meta-right-icons">
+                    <a href="#" id="text-to-speech-btn" class="text-to-speech-button" title="Dengarkan Berita">
+                        <i class="fas fa-volume-up"></i>
+                    </a>
+                    <div class="social-share">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}" target="_blank" class="facebook-share" title="Share ke Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}" target="_blank" class="twitter-share" title="Share ke Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://wa.me/?text=${encodedTitle}%20${encodedUrl}" target="_blank" class="whatsapp-share" title="Share ke WhatsApp">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}" target="_blank" class="telegram-share" title="Share ke Telegram">
+                            <i class="fab fa-telegram-plane"></i>
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Function to get a preferred Indonesian voice
+        function getIndonesianVoice() {
+            // Try to find an Indonesian voice
+            const idVoice = voices.find(voice => voice.lang === 'id-ID' || voice.lang.startsWith('id-'));
+            if (idVoice) {
+                console.log("Using Indonesian voice:", idVoice.name);
+                return idVoice;
+            }
+            // Fallback to any voice if Indonesian is not found
+            console.warn("Indonesian voice not found, using default voice.");
+            return null; // Let the browser pick default
+        }
+
+        // --- FUNGSI UTAMA TEXT-TO-SPEECH ---
+        function toggleSpeech() {
+            const articleContentElement = document.querySelector('.article-content');
+            const ttsBtnIcon = document.querySelector('#text-to-speech-btn i');
+
+            // If speech is currently ongoing, stop it
+            if (synth.speaking) {
+                synth.cancel();
+                isSpeaking = false;
+                ttsBtnIcon.classList.remove('fa-volume-mute');
+                ttsBtnIcon.classList.add('fa-volume-up');
+                showTtsLoading(false); // Hide loading if stopped
+                // Remove any active highlight
+                if (highlightedElement) {
+                    highlightedElement.classList.remove('tts-highlight');
+                    highlightedElement = null;
+                }
+                console.log("Speech stopped.");
+                // Reset chunks and index if manually stopped
+                articleChunks = []; 
+                currentChunkIndex = 0;
+                return;
+            }
+
+            if (!articleContentElement) {
+                console.error("Article content element not found.");
+                showTemporaryMessage("Konten artikel tidak ditemukan untuk dibaca.", 3000);
+                return;
+            }
+
+            // Prepare text chunks if not already prepared or if starting new speech
+            // Only prepare chunks if not already speaking from a paused state
+            if (articleChunks.length === 0 || currentChunkIndex >= articleChunks.length) {
+                articleChunks = []; // Reset for new article or full re-read
+                currentChunkIndex = 0;
+
+                // Iterate through all direct children of article-content (p, h1, h2, li, etc.)
+                Array.from(articleContentElement.children).forEach((childElement, index) => {
+                    // Ensure it's an element node and has some text content
+                    if (childElement.nodeType === Node.ELEMENT_NODE && childElement.textContent.trim().length > 0) {
+                        // Assign a unique ID if it doesn't have one
+                        if (!childElement.id) {
+                            childElement.id = `tts-chunk-el-${index}`;
+                        }
+                        // Get the text content, strip HTML and process acronyms
+                        const processedText = stripHtmlAndProcessAcronyms(childElement.innerHTML);
+                        
+                        // Split by sentences (period, question mark, exclamation mark followed by space or end of string)
+                        // or by double newlines (paragraphs).
+                        // Use a non-capturing group (?:...) for the split delimiters to not include them in the chunks.
+                        // Filter out empty strings from split, then trim each chunk
+                        const sentenceChunks = processedText.split(/(?<=[.?!])\s+|\n\n/).filter(chunk => chunk.trim().length > 0);
+
+                        sentenceChunks.forEach(sentence => {
+                            articleChunks.push({
+                                text: sentence.trim(),
+                                elementId: childElement.id // Reference to the parent element for highlighting
+                            });
+                        });
+                    }
+                });
+
+                console.log("Article chunks created:", articleChunks.length);
+            }
+
+            if (articleChunks.length === 0) {
+                console.warn("No text to speak after chunking.");
+                showTemporaryMessage("Tidak ada teks yang bisa dibaca untuk artikel ini.", 3000);
+                return;
+            }
+
+            // If TTS voices are not ready, show loading and try to populate again
+            if (!ttsReady) {
+                showTtsLoading(true); // Show loading overlay
+                populateVoiceList(); // Try to populate again
+                
+                // Set a timeout to retry after a short delay, giving voices time to load
+                setTimeout(() => {
+                    if (ttsReady) {
+                        // If voices are ready now, proceed to speak
+                        speakNextChunk(ttsBtnIcon);
+                    } else {
+                        // If still not ready, hide loading and inform user
+                        showTtsLoading(false);
+                        showTemporaryMessage("Memuat suara. Silakan coba lagi sebentar.", 3000);
+                        console.warn("TTS voices still not ready after retry.");
+                    }
+                }, 1000); // Wait 1 second before retrying
+                return; // Exit current toggleSpeech call
+            }
+
+            // If voices are already ready, proceed directly
+            speakNextChunk(ttsBtnIcon);
+        }
+
+        // Helper function to speak the next chunk of content
+        function speakNextChunk(ttsBtnIcon) {
+            // Remove previous highlight before speaking new chunk
+            if (highlightedElement) {
+                highlightedElement.classList.remove('tts-highlight');
+                highlightedElement = null;
+            }
+
+            if (currentChunkIndex < articleChunks.length) {
+                const chunkData = articleChunks[currentChunkIndex];
+                const textToSpeak = chunkData.text;
+                const targetElement = document.getElementById(chunkData.elementId);
+
+                if (textToSpeak.length === 0) { // Skip empty chunks
+                    currentChunkIndex++;
+                    speakNextChunk(ttsBtnIcon);
+                    return;
+                }
+
+                // Apply highlight to current element and scroll
+                if (targetElement) {
+                    targetElement.classList.add('tts-highlight');
+                    highlightedElement = targetElement;
+                    // Scroll into view, centered, with smooth behavior
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    console.warn(`Target element with ID ${chunkData.elementId} not found for highlighting. Skipping highlight for this chunk.`);
+                    // Even if element not found, we still want to speak the text
+                }
+
+                console.log(`Speaking chunk ${currentChunkIndex + 1}/${articleChunks.length}: "${textToSpeak.substring(0, Math.min(textToSpeak.length, 50))}..."`); // Log first 50 chars or less
+
+                currentUtterance = new SpeechSynthesisUtterance(textToSpeak);
+                currentUtterance.lang = 'id-ID'; // Set language to Indonesian
+
+                const selectedVoice = getIndonesianVoice();
+                if (selectedVoice) {
+                    currentUtterance.voice = selectedVoice;
+                }
+
+                currentUtterance.onstart = () => {
+                    isSpeaking = true;
+                    isPausedBySystem = false; // Reset system pause flag
+                    ttsBtnIcon.classList.remove('fa-volume-up');
+                    ttsBtnIcon.classList.add('fa-volume-mute');
+                    showTtsLoading(false); // Hide loading once speaking starts
+                };
+
+                currentUtterance.onend = () => {
+                    // Remove highlight after chunk finishes
+                    if (highlightedElement) {
+                        highlightedElement.classList.remove('tts-highlight');
+                        highlightedElement = null;
+                    }
+
+                    if (!isPausedBySystem) { // Only advance chunk if not paused by system
+                        currentChunkIndex++;
+                    }
+                    if (currentChunkIndex < articleChunks.length) {
+                        // Speak next chunk after a short pause for natural flow
+                        setTimeout(() => speakNextChunk(ttsBtnIcon), 100); 
+                    } else {
+                        // All chunks spoken
+                        isSpeaking = false;
+                        ttsBtnIcon.classList.remove('fa-volume-mute');
+                        ttsBtnIcon.classList.add('fa-volume-up');
+                        console.log("All article chunks spoken.");
+                        articleChunks = []; // Reset chunks for next time
+                        currentChunkIndex = 0;
+                    }
+                };
+
+                currentUtterance.onpause = (event) => {
+                    console.log("Speech paused by system (or user).");
+                    isPausedBySystem = true;
+                    isSpeaking = false; // Set isSpeaking to false when paused
+                    ttsBtnIcon.classList.remove('fa-volume-mute');
+                    ttsBtnIcon.classList.add('fa-volume-up');
+                    // Do not remove highlight here, as we are paused on this chunk
+                };
+
+                currentUtterance.onresume = (event) => {
+                    console.log("Speech resumed.");
+                    isPausedBySystem = false;
+                    isSpeaking = true; // Set isSpeaking to true when resumed
+                    ttsBtnIcon.classList.remove('fa-volume-up');
+                    ttsBtnIcon.classList.add('fa-volume-mute');
+                    // Re-apply highlight if it was removed by onpause (though it shouldn't be)
+                    if (highlightedElement && !highlightedElement.classList.contains('tts-highlight')) {
+                           highlightedElement.classList.add('tts-highlight');
+                    }
+                };
+
+                currentUtterance.onerror = (event) => {
+                    console.error('SpeechSynthesisUtterance.onerror', event.error, "for chunk:", textToSpeak);
+                    isSpeaking = false;
+                    isPausedBySystem = false; // Reset flag on error
+                    ttsBtnIcon.classList.remove('fa-volume-mute');
+                    ttsBtnIcon.classList.add('fa-volume-up');
+                    showTtsLoading(false); // Hide loading on error
+                    showTemporaryMessage("Gagal memutar audio. Coba lagi atau periksa pengaturan suara perangkat Anda.", 5000);
+                    // Remove any active highlight on error
+                    if (highlightedElement) {
+                        highlightedElement.classList.remove('tts-highlight');
+                        highlightedElement = null;
+                    }
+                    articleChunks = []; // Reset chunks on error
+                    currentChunkIndex = 0;
+                };
+
+                try {
+                    synth.speak(currentUtterance);
+                } catch (error) {
+                    console.error("Error calling synth.speak() for chunk:", error);
+                    showTtsLoading(false); // Hide loading on error
+                    showTemporaryMessage("Terjadi kesalahan saat memulai Text-to-Speech.", 3000);
+                    // Remove any active highlight on error
+                    if (highlightedElement) {
+                        highlightedElement.classList.remove('tts-highlight');
+                        highlightedElement = null;
+                    }
+                    articleChunks = []; // Reset chunks on error
+                    currentChunkIndex = 0;
+                }
+            } else {
+                // No more chunks to speak, reset state
+                isSpeaking = false;
+                ttsBtnIcon.classList.remove('fa-volume-mute');
+                ttsBtnIcon.classList.add('fa-volume-up');
+                showTtsLoading(false);
+                // Ensure any final highlight is removed
+                if (highlightedElement) {
+                    highlightedElement.classList.remove('tts-highlight');
+                    highlightedElement = null;
+                }
+                articleChunks = [];
+                currentChunkIndex = 0;
+            }
+        }
+
+
+        // --- FUNGSI LOAD DETAIL BERITA ---
+        async function loadNewsDetail() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const newsId = urlParams.get('id');
+            const articleContainer = document.getElementById('article-detail-container');
+            const detailPageTitle = document.getElementById('detail-page-title');
+
+            if (!newsId) {
+                articleContainer.innerHTML = '<p style="color:red;">ID berita tidak ditemukan.</p>';
+                detailPageTitle.textContent = 'Berita Tidak Ditemukan';
+                return;
+            }
+
+            try {
+                const docRef = db.collection('berita').doc(newsId);
+                const doc = await docRef.get();
+
+                if (doc.exists) {
+                    const news = doc.data();
+                    const cleanedContent = removeFirstImageTag(news.content);
+                    detailPageTitle.textContent = news.title || 'Detail Berita';
+
+                    const mainImageUrl = getFirstImageFromContent(news.content) || `https://picsum.photos/1200/600?random=${news.id}`;
+                    const currentUrl = window.location.href;
+                    // Use the new combined function
+                    const shareAndTtsButtons = createShareAndTtsButtons(news.title || 'Judul Berita', currentUrl);
+
+                    articleContainer.innerHTML = `
+                        <h1 class="article-title">${news.title || 'Judul Berita'}</h1>
+                        <p class="article-meta">
+                            Oleh: ${news.editor_name || 'Petungan'} - ${news.createdAt ? news.createdAt.toDate().toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}
+                            ${shareAndTtsButtons}
+                        </p>
+                        <img src="${mainImageUrl}" alt="${news.title || 'Gambar Berita'}" class="article-image">
+                        <div class="article-content">${cleanedContent || '<p>Konten berita tidak tersedia.</p>'}</div>
+                    `;
+
+                    // Add event listener for text-to-speech button after it's rendered
+                    document.getElementById('text-to-speech-btn').addEventListener('click', (e) => {
+                        e.preventDefault();
+                        toggleSpeech();
+                    });
+
+                    // Load related news based on category
+                    if (news.category) {
+                        loadRelatedNews(news.category, newsId);
+                    }
+
+                    // --- Menampilkan pop-up khusus di bawah judul berita ---
+                    const popupMessage = document.createElement('div');
+                    popupMessage.className = 'custom-popup-message';
+                    // Menggunakan dua span untuk dua baris teks dengan jarak
+                    popupMessage.innerHTML = '<span>Selamat datang di Petungan.com</span><span>Klik Icon Speaker, isi berita akan dibacakan otomatis.</span>';
+
+                    // Tentukan posisi di bawah judul berita
+                    const titleElement = articleContainer.querySelector('.article-title');
+                    if (titleElement) {
+                        // Menggunakan getBoundingClientRect untuk mendapatkan posisi dan ukuran elemen
+                        const titleRect = titleElement.getBoundingClientRect();
+                        const articleContainerRect = articleContainer.getBoundingClientRect();
+                        
+                        // Menambahkan pop-up ke article-container agar posisinya relatif terhadap artikel
+                        articleContainer.appendChild(popupMessage);
+                        
+                        // Set posisi top relatif terhadap parent (article-container)
+                        // titleRect.bottom adalah posisi Y paling bawah judul relatif terhadap viewport
+                        // articleContainerRect.top adalah posisi Y paling atas article-container relatif terhadap viewport
+                        // Selisihnya memberikan posisi bawah judul relatif terhadap bagian atas article-container
+                        popupMessage.style.top = `${(titleRect.bottom - articleContainerRect.top) + 20}px`; // +20px untuk jarak dari judul
+                        
+                        // CSS 'left: 50%; transform: translateX(-50%);' akan menempatkannya di tengah horizontal secara otomatis
+
+                        setTimeout(() => {
+                            popupMessage.classList.add('show');
+                        }, 100); // Sedikit delay untuk memastikan rendering elemen
+                        setTimeout(() => {
+                            popupMessage.classList.remove('show');
+                            setTimeout(() => {
+                                // Hapus elemen dari DOM setelah transisi opacity selesai
+                                if (popupMessage.parentNode) {
+                                    popupMessage.parentNode.removeChild(popupMessage);
+                                }
+                            }, 400); // Sesuaikan dengan durasi transisi opacity (0.4s)
+                        }, 4000); // Durasi pop-up 4 detik
+                    } else {
+                        console.warn("Elemen judul berita tidak ditemukan, tidak dapat memposisikan pop-up dengan tepat.");
+                        // Fallback jika judul tidak ditemukan, bisa tampilkan pop-up umum jika diinginkan
+                        showTemporaryMessage("Selamat datang di Petungan.com. Klik Icon Speaker, isi berita akan dibacakan otomatis.", 4000);
+                    }
+
+                } else {
+                    articleContainer.innerHTML = '<p style="color:red;">Berita tidak ditemukan.</p>';
+                    detailPageTitle.textContent = 'Berita Tidak Ditemukan';
+                }
+            } catch (error) {
+                console.error("Error fetching news detail:", error);
+                articleContainer.innerHTML = '<p style="color:red;">Gagal memuat detail berita. Pastikan koneksi internet Anda stabil atau coba lagi nanti.</p>';
+                detailPageTitle.textContent = 'Error';
+            }
+        }
+
+        // --- FUNGSI LOAD BERITA TERKAIT ---
+        async function loadRelatedNews(category, currentNewsId) {
+            const relatedNewsSection = document.getElementById('related-news-section');
+            const relatedNewsGrid = document.getElementById('related-news-grid');
+            relatedNewsGrid.innerHTML = '<p style="text-align: center;">Memuat berita terkait...</p>';
+            relatedNewsSection.style.display = 'block';
+
+            try {
+                const snapshot = await db.collection('berita')
+                    .where('category', '==', category)
+                    .orderBy('createdAt', 'desc')
+                    .limit(4) // Ambil beberapa berita terkait
+                    .get();
+
+                relatedNewsGrid.innerHTML = ''; // Bersihkan placeholder
+
+                let count = 0;
+                snapshot.forEach(doc => {
+                    if (doc.id !== currentNewsId && count < 3) { // Jangan tampilkan berita yang sedang dilihat, dan batasi 3
+                        const news = doc.data();
+                        relatedNewsGrid.appendChild(createGridItem({ id: doc.id, ...news }));
+                        count++;
+                    }
+                });
+
+                if (count === 0) {
+                    relatedNewsGrid.innerHTML = '<p style="text-align: center;">Tidak ada berita terkait lainnya.</p>';
+                }
+
+            } catch (error) {
+                console.error("Error fetching related news:", error);
+                relatedNewsGrid.innerHTML = '<p style="color:red; text-align: center;">Gagal memuat berita terkait.</p>';
+            }
+        }
+
+        // --- FUNGSI PENCARIAN ---
+        async function searchNews(keyword) {
+            if (!keyword || keyword.trim() === '') {
+                document.getElementById('search-results').innerHTML = '<p style="color: red; text-align: center;">Silakan masukkan kata kunci pencarian.</p>';
+                return;
+            }
+            
+            document.getElementById('search-overlay').classList.remove('visible');
+            
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.value = '';
+            }
+            
+            window.location.href = `index.html?cari=${encodeURIComponent(keyword)}`;
+        }
+        
+        // --- FUNGSI LOAD KATEGORI UNTUK POPUP ---
         async function loadCategoriesForPopup() {
             const container = document.getElementById('category-grid'); 
             if (!container) {
@@ -643,147 +1611,138 @@
             }
         }
 
-        // Fungsi searchNews (disalin dari index.html)
-        async function searchNews(keyword) {
-            if (!keyword || keyword.trim() === '') {
-                document.getElementById('search-results').innerHTML = '<p style="color: red; text-align: center;">Silakan masukkan kata kunci pencarian.</p>';
-                return;
+        // Handle initial active class based on URL parameters for BOTH mobile and desktop nav
+        const activateNavButtons = (prefix) => {
+            // Remove active class from all relevant nav links first
+            document.querySelectorAll(`.${prefix}nav a`).forEach(link => link.classList.remove('active'));
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentCategorySlug = urlParams.get('kategori');
+
+            if (!urlParams.has('kategori') && !urlParams.has('cari') && !urlParams.has('terbaru')) {
+                // Activate Home button if no specific params
+                if (document.getElementById(prefix + 'home-btn')) {
+                    document.getElementById(prefix + 'home-btn').classList.add('active');
+                }
+            } else if (urlParams.has('kategori')) {
+                // Activate specific category link or "Semua Kategori" / "Kategori" fallback
+                if (currentCategorySlug && document.getElementById(`${prefix}category-${currentCategorySlug}-btn`)) {
+                    document.getElementById(`${prefix}category-${currentCategorySlug}-btn`).classList.add('active');
+                } else if (document.getElementById(`${prefix}more-menu-btn`)) { // For mobile "Kategori" button
+                    document.getElementById(`${prefix}more-menu-btn`).classList.add('active');
+                } else if (document.getElementById(`${prefix}all-categories-btn`)) { // For desktop "Semua Kategori" button
+                    document.getElementById(`${prefix}all-categories-btn`).classList.add('active');
+                } else if (document.getElementById(`${prefix}fallback-category-btn`)) { // For desktop "Kategori" fallback
+                    document.getElementById(`${prefix}fallback-category-btn`).classList.add('active');
+                }
+            } else if (urlParams.has('cari')) {
+                // Activate search button/icon
+                if (document.getElementById(prefix + 'search-news-btn')) {
+                    document.getElementById(prefix + 'search-news-btn').classList.add('active');
+                } else if (document.getElementById(`${prefix}search-news-btn-icon`)) { // For desktop search icon
+                    document.getElementById(`${prefix}search-news-btn-icon`).classList.add('active');
+                }
+            } else if (urlParams.has('terbaru')) {
+                // Activate latest news button
+                if (document.getElementById(prefix + 'latest-news-btn')) {
+                    document.getElementById(prefix + 'latest-news-btn').classList.add('active');
+                }
             }
-            document.getElementById('search-overlay').classList.remove('visible');
-            const searchInput = document.getElementById('search-input');
-            if (searchInput) {
-                searchInput.value = '';
-            }
-            window.location.href = `index.html?cari=${encodeURIComponent(keyword)}`;
-        }
+        };
 
-        // Fungsi untuk membuat elemen kartu artikel terkait
-        function createRelatedArticleCard(news) {
-            const newsUrl = `detail.html?id=${news.id}`;
-            const imageUrl = getFirstImageFromContent(news.content) || `https://picsum.photos/300/150?random=${news.id}`; // Gambar lebih kecil
-            const element = document.createElement('a');
-            element.href = newsUrl;
-            element.className = 'related-article-card';
+        // FUNGSI BARU: Memuat kategori ke navigasi desktop (disesuaikan untuk detail.html)
+        async function loadCategoriesForDesktopNav() {
+            const desktopMainNav = document.getElementById('desktop-main-nav');
+            // Clear any existing content to ensure only desired links are present
+            desktopMainNav.innerHTML = '';
 
-            element.innerHTML = `
-                <img src="${imageUrl}" alt="${news.title || 'Gambar Artikel Terkait'}">
-                <div class="content">
-                    <h3 class="title">${news.title || 'Judul Artikel Terkait'}</h3>
-                    <p class="meta">Oleh: ${news.editor_name || 'Petungan'} - ${news.createdAt ? news.createdAt.toDate().toLocaleDateString('id-ID') : ''}</p>
-                </div>
-            `;
-            return element;
-        }
-
-        // Fungsi untuk memuat artikel terkait
-        async function loadRelatedArticles(currentArticleId, categorySlug) {
-            const relatedArticlesGrid = document.getElementById('related-articles-grid');
-            const noRelatedArticlesMsg = document.getElementById('no-related-articles');
-            relatedArticlesGrid.innerHTML = ''; // Bersihkan konten sebelumnya
-            noRelatedArticlesMsg.style.display = 'none';
-
-            if (!categorySlug) {
-                noRelatedArticlesMsg.textContent = 'Kategori tidak tersedia untuk mencari artikel terkait.';
-                noRelatedArticlesMsg.style.display = 'block';
-                return;
-            }
+            // Add Home button
+            const homeLink = document.createElement('a');
+            homeLink.href = 'index.html';
+            homeLink.id = 'desktop-home-btn';
+            homeLink.innerHTML = '<i class="fas fa-home"></i><span>Home</span>';
+            desktopMainNav.appendChild(homeLink);
 
             try {
-                // Ambil hingga 4 artikel lain dari kategori yang sama, tidak termasuk artikel saat ini
-                const snapshot = await db.collection('berita')
-                    .where('category', '==', categorySlug)
-                    .orderBy('createdAt', 'desc')
-                    .limit(5) // Ambil 5, nanti filter yang sedang dibuka
-                    .get();
+                const mainCategoriesSnapshot = await db.collection('kategori').orderBy('nama').get();
+                const categoriesToAdd = [];
 
-                const relatedArticles = [];
-                snapshot.forEach(doc => {
-                    if (doc.id !== currentArticleId) { // Pastikan bukan artikel yang sedang dilihat
-                        relatedArticles.push({ id: doc.id, ...doc.data() });
+                mainCategoriesSnapshot.forEach(doc => {
+                    const mainCategory = doc.data();
+                    if (mainCategory.slug && mainCategory.nama) {
+                        categoriesToAdd.push({
+                            nama: mainCategory.nama,
+                            slug: mainCategory.slug
+                        });
                     }
                 });
 
-                if (relatedArticles.length === 0) {
-                    noRelatedArticlesMsg.textContent = 'Tidak ada artikel terkait lainnya dalam kategori ini.';
-                    noRelatedArticlesMsg.style.display = 'block';
-                } else {
-                    relatedArticles.slice(0, 4).forEach(news => { // Tampilkan maksimal 4
-                        relatedArticlesGrid.appendChild(createRelatedArticleCard(news));
-                    });
+                const maxCategoriesToShow = 6;
+                let categoriesRendered = 0;
+
+                // Add specific categories
+                for (const categoryData of categoriesToAdd) {
+                    if (categoriesRendered >= maxCategoriesToShow) break;
+                    const link = document.createElement('a');
+                    link.href = `index.html?kategori=${categoryData.slug}`;
+                    link.id = `desktop-category-${categoryData.slug}-btn`;
+                    link.textContent = categoryData.nama;
+                    link.classList.add('dynamic-category-link'); // Add class for identification
+                    desktopMainNav.appendChild(link);
+                    categoriesRendered++;
                 }
+
+                // Add "Semua Kategori" button if there are hidden categories
+                if (categoriesToAdd.length > maxCategoriesToShow) {
+                    const allCategoriesLink = document.createElement('a');
+                    allCategoriesLink.href = '#';
+                    allCategoriesLink.id = 'desktop-all-categories-btn';
+                    allCategoriesLink.innerHTML = '<i class="fas fa-th-large"></i><span>Semua Kategori</span>';
+                    allCategoriesLink.classList.add('dynamic-category-link'); // Add class for identification
+                    allCategoriesLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        loadCategoriesForPopup();
+                        document.getElementById('more-menu-overlay').classList.add('visible');
+                    });
+                    desktopMainNav.appendChild(allCategoriesLink);
+                }
+                
+                // No "Berita Terbaru" button for detail page desktop nav as per request
+
+                // Activate Home button or relevant category on detail page
+                activateNavButtons('desktop-');
 
             } catch (error) {
-                console.error("Gagal memuat artikel terkait:", error);
-                noRelatedArticlesMsg.textContent = 'Gagal memuat artikel terkait. Silakan coba lagi.';
-                noRelatedArticlesMsg.style.display = 'block';
+                console.error("Gagal memuat kategori untuk navigasi desktop:", error);
+                // Fallback: If categories fail to load, still show Home and a generic Kategori button
+                const fallbackCategoryLink = document.createElement('a');
+                fallbackCategoryLink.href = '#';
+                fallbackCategoryLink.id = 'desktop-fallback-category-btn';
+                fallbackCategoryLink.innerHTML = '<i class="fas fa-th-large"></i><span>Kategori</span>'; // Default text if error
+                fallbackCategoryLink.classList.add('dynamic-category-link'); // Add class for identification
+                fallbackCategoryLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    loadCategoriesForPopup();
+                    document.getElementById('more-menu-overlay').classList.add('visible');
+                });
+                desktopMainNav.appendChild(fallbackCategoryLink);
+
+                activateNavButtons('desktop-');
             }
         }
 
-        async function getNewsDetail(){
-            const params = new URLSearchParams(window.location.search);
-            const newsId = params.get("id");
-            const loadingContainer = document.getElementById("loading-container");
-            const relatedArticlesSection = document.getElementById('related-articles-section'); // Ambil section artikel terkait
 
-            if(!newsId) {
-                loadingContainer.innerHTML='<p style="color:red;">Error: ID Berita tidak ditemukan.</p>';
-                relatedArticlesSection.style.display = 'none'; // Sembunyikan bagian terkait jika ada error
-                return;
-            }
-
-            try {
-                const docSnap = await db.collection("berita").doc(newsId).get();
-                if(docSnap.exists){
-                    const data = docSnap.data();
-                    
-                    const articleTitle = data.title || "Judul tidak tersedia";
-                    const articleDescription = data.content ? data.content.replace(/<[^>]*>/g, "").substring(0, 155) + '...' : 'Baca selengkapnya di situs Petungan.';
-                    const articleImage = getFirstImageFromContent(data.content) || `https://petungan.github.io/petungan-News/logo.png`;
-                    const currentUrl = window.location.href;
-                    
-                    document.title = articleTitle;
-                    document.querySelector('meta[name="description"]').setAttribute("content", articleDescription);
-                    document.querySelector('meta[property="og:title"]').setAttribute("content", articleTitle);
-                    document.querySelector('meta[property="og:description"]').setAttribute("content", articleDescription);
-                    document.querySelector('meta[property="og:image"]').setAttribute("content", articleImage);
-                    document.querySelector('meta[property="og:url"]').setAttribute("content", currentUrl);
-                    document.querySelector('meta[name="twitter:title"]').setAttribute("content", articleTitle);
-                    document.querySelector('meta[name="twitter:description"]').setAttribute("content", articleDescription);
-                    document.querySelector('meta[name="twitter:image"]').setAttribute("content", articleImage);
-
-                    document.getElementById("detail-title").textContent = articleTitle;
-                    document.getElementById("detail-category").textContent = formatCategoryName(data.category);
-                    document.getElementById("detail-editor").textContent = data.editor_name;
-                    if (data.createdAt && data.createdAt.toDate) {
-                        document.getElementById("detail-timestamp").textContent = data.createdAt.toDate().toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"});
-                    }
-                    
-                    document.getElementById("article-content").innerHTML = data.content || '<p>Konten tidak tersedia.</p>';
-                    
-                    document.getElementById("article-container").style.display = "block";
-                    loadingContainer.style.display = "none";
-                    
-                    initSocialShare(articleTitle);
-                    
-                    // Panggil fungsi untuk memuat artikel terkait
-                    loadRelatedArticles(newsId, data.category);
-
-                } else {
-                    loadingContainer.innerHTML='<p style="color:red;">Berita tidak ditemukan.</p>';
-                    relatedArticlesSection.style.display = 'none'; // Sembunyikan bagian terkait jika berita tidak ditemukan
-                }
-            } catch(e) {
-                console.error("Error:",e);
-                loadingContainer.innerHTML='<p style="color:red;">Gagal memuat berita.</p>';
-                relatedArticlesSection.style.display = 'none'; // Sembunyikan bagian terkait jika ada error
-            }
-        }
-        
+        // --- EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', () => {
-            getNewsDetail();
+            loadNewsDetail(); 
+            loadCategoriesForDesktopNav(); // Call this new function for detail page
 
-            // Event listener untuk tombol navigasi (disalin dari index.html)
-            document.getElementById('more-menu-btn').addEventListener('click', (e) => { 
+            // Event listener untuk Navigasi Mobile (sudah ada)
+            document.getElementById('mobile-home-btn').addEventListener('click', (e) => { 
+                e.preventDefault(); 
+                window.location.href = 'index.html';
+            });
+            document.getElementById('mobile-more-menu-btn').addEventListener('click', (e) => { 
                 e.preventDefault(); 
                 loadCategoriesForPopup(); 
                 document.getElementById('more-menu-overlay').classList.add('visible'); 
@@ -791,13 +1750,14 @@
                 e.currentTarget.classList.add('active');
             });
 
+            // Tutup overlay menu kategori
             document.getElementById('more-menu-overlay').addEventListener('click', (e) => { 
                 if (e.target === document.getElementById('more-menu-overlay')) { 
                     document.getElementById('more-menu-overlay').classList.remove('visible'); 
                 } 
             });
 
-            document.getElementById('search-news-btn').addEventListener('click', (e) => {
+            document.getElementById('mobile-search-news-btn').addEventListener('click', (e) => {
                 e.preventDefault();
                 document.getElementById('search-overlay').classList.add('visible');
                 document.querySelectorAll('.mobile-nav a').forEach(link => link.classList.remove('active'));
@@ -817,19 +1777,47 @@
             });
             
             document.getElementById('search-input').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') { const keyword = document.getElementById('search-input').value.trim(); searchNews(keyword); }
+                if (e.key === 'Enter') {
+                    const keyword = document.getElementById('search-input').value.trim();
+                    searchNews(keyword);
+                }
             });
             
-            document.getElementById('latest-news-btn').addEventListener('click', (e) => {
+            document.getElementById('mobile-latest-news-btn').addEventListener('click', (e) => {
                 e.preventDefault();
+                window.location.href = 'index.html?terbaru=true';
                 document.querySelectorAll('.mobile-nav a').forEach(link => link.classList.remove('active'));
                 e.currentTarget.classList.add('active');
-                window.location.href = 'index.html?terbaru=true';
             });
 
-            // Atur active class untuk Home secara default di detail.html
-            document.querySelector('.mobile-nav a[href="index.html"]').classList.add('active');
+
+            // Event listener untuk tombol pencarian desktop (ikon di kanan atas)
+            const desktopSearchIconBtn = document.getElementById('desktop-search-news-btn-icon'); 
+            if (desktopSearchIconBtn) { 
+                desktopSearchIconBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.getElementById('search-overlay').classList.add('visible');
+                    document.getElementById('search-input').focus();
+                });
+            }
+
+            // Handle initial active class based on URL parameters for mobile nav
+            activateNavButtons('mobile-'); 
+            // Desktop nav activation is called inside loadCategoriesForDesktopNav()
+            // to ensure dynamic elements are present before trying to activate them.
+
         });
+
+        // SERVICE WORKER
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => { 
+                navigator.serviceWorker.register('./sw.js').then(reg => {
+                    console.log('Service Worker Registered:', reg);
+                }).catch(err => {
+                    console.error('Service Worker Registration Failed:', err);
+                });
+            }); 
+        }
     </script>
 </body>
 </html>
